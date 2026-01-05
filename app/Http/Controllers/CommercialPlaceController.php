@@ -88,7 +88,7 @@ class CommercialPlaceController extends Controller {
             }
 
             $place = CommercialPlace::with([
-                'locations',
+                'location',
                 'images',
                 'phoneNumbers',
                 'appointment',
@@ -253,7 +253,6 @@ class CommercialPlaceController extends Controller {
 
             $validated = $request->validate([
                 'name'                => 'sometimes|string|max:255',
-                'locations'           => 'sometimes|array',
 
                 'location' => 'sometimes|array',
                 'location.address_id' => 'sometimes|integer',
@@ -385,7 +384,7 @@ class CommercialPlaceController extends Controller {
             return response()->json([
                 'success' => true,
                 'data' => $place->load([
-                    'locations',
+                    'location',
                     'profile_image_path',
                     'commission',
                     'images',
