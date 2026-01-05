@@ -315,7 +315,7 @@ class CartsController extends Controller {
                 'other_user.address'           => 'sometimes|string' ,
                 'payment_method_id' => 'required|integer|exists:method,id',
                 'address_id'        => 'sometimes|integer' ,
-                'order_time'        => 'sometimes',
+                'time_order'        => 'sometimes|timestamp',
                 'note'              => 'sometimes|string' ,
             ]);
             
@@ -342,7 +342,7 @@ class CartsController extends Controller {
                 'discount' => $cart->total_discount ,
                 'payment_method_id' => $validated['payment_method_id'],
                 'note' => $validated['note'] ,
-                'order_time' => $validated['order_time'] ,
+                'order_time' => $validated['time_order'] ,
             ]);
 
             $orderAddress = null ;
