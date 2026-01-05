@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CustomerModel\Address;
 use App\Models\CustomerModel\Cart;
 use App\Models\CustomerModel\CartItem;
 use App\Models\CustomerModel\CartItemOption;
@@ -309,14 +310,15 @@ class CartsController extends Controller {
             $validated = $request->validate([
                 'phone_number'      => 'sometimes|string',
                 'payment_method_id' => 'required|string|exists:method,id',
-                'lng'               => 'required|numeric',
-                'lat'               => 'required|numeric',
-                'city'              => 'required|string',
-                'street_name'       => 'required|string',
-                'zone_id'           => 'required|integer',
-                'building_number'   => 'nullable|string',
-                'floor_number'      => 'nullable|string',
-                'apartment_number'  => 'nullable|string',
+                'address_id'        => 'nullable|integer' ,
+                'lng'               => 'required|numeric' ,
+                'lat'               => 'required|numeric' ,
+                'city'              => 'required|string'  ,
+                'street_name'       => 'required|string'  ,
+                'zone_id'           => 'required|integer' ,
+                'building_number'   => 'nullable|string'  ,
+                'floor_number'      => 'nullable|string'  ,
+                'apartment_number'  => 'nullable|string'  ,
             ]);
             
             $user = auth('customer')->user();
@@ -349,17 +351,34 @@ class CartsController extends Controller {
                 'payment_method_id' => $validated['payment_method_id'],
             ]);
 
-            $orderAddress = OrderAddress::create([
-                'order_id' => $order->id ,
-                'zone_id' => $request->zone_id ,
-                'lng' => $request->lng ,
-                'lat' => $request->lat ,
-                'city' => $request->city ,
-                'street_name' => $request->street_name ,
-                'building_number' => $request->building_number ,
-                'floor_number' => $request->floor_number ,
-                'apartment_number' => $request->apartment_number 
-            ]);
+            $orderAddress = null ;
+            
+            if($request->address_id == null){
+                $orderAddress = OrderAddress::create([
+                    'order_id' => $order->id ,
+                    'zone_id' => $request->zone_id ,
+                    'lng' => $request->lng ,
+                    'lat' => $request->lat ,
+                    'city' => $request->city ,
+                    'street_name' => $request->street_name ,
+                    'building_number' => $request->building_number ,
+                    'floor_number' => $request->floor_number ,
+                    'apartment_number' => $request->apartment_number 
+                ]);
+            }else{
+                $address = Address::find($request->address_id);
+                $orderAddress = OrderAddress::create([
+                    'order_id' => $order->id ,
+                    'zone_id' => $address->zone_id ,
+                    'lng' => $address->lng ,
+                    'lat' => $address->lat ,
+                    'city' => $address->city ,
+                    'street_name' => $address->street_name ,
+                    'building_number' => $address->building_number ,
+                    'floor_number' => $address->floor_number ,
+                    'apartment_number' => $address->apartment_number 
+                ]);
+            }
 
             $order->total_recipt = $cart->total_price + $cart->delivery_price + $cart->services - $cart->total_discount ;
             $order->save();

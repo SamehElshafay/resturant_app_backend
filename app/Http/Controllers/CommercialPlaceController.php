@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CategoryModels\Category;
 use App\Models\CategoryModels\CommercialCategory;
 use App\Models\CommercialPlaceModels\CommercialPlace;
 use App\Models\CommercialPlaceModels\CommercialPlaceCommission;
@@ -10,10 +9,8 @@ use App\Models\CommercialPlaceModels\CommercialPlaceImages;
 use App\Models\CommercialPlaceModels\CommercialPlaceProfileImages;
 use App\Models\CommercialPlaceModels\Location;
 use App\Models\CommercialPlaceModels\PhoneNumbers;
-use App\Models\CommercialPlaceModels\SingleOffer;
 use App\Models\CustomerModel\FavoritePlace;
 use App\Models\ProductsModel\Product;
-use App\Services\DistanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
