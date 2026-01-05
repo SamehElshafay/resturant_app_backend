@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 class ZoneController extends Controller
 {
     public function index(){
-        return Zone::all();
+        return [
+            'success' => true ,
+            'zones' => Zone::all()
+        ];
     }
 }

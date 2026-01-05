@@ -275,6 +275,10 @@ Route::prefix('customer')->group(function () {
         Route::post('/', [FavoritePlaceController::class, 'store']);
         Route::delete('{id}', [FavoritePlaceController::class, 'destroy']);
     });
+
+    Route::prefix('zones')->group(function () {
+        Route::get('/', [ZoneController::class, 'index']);
+    });
 });
 
 Route::prefix('commercial-place')->group(function () {
@@ -303,6 +307,8 @@ Route::prefix('commercial-place')->group(function () {
     });*/
 });
 
-Route::prefix('zones')->group(function () {
-    Route::get('/', [ZoneController::class, 'index']);
-});
+
+/*git add .
+git commit -m "update"
+git push
+*/
