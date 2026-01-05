@@ -316,6 +316,7 @@ class CartsController extends Controller {
                 'payment_method_id' => 'required|integer|exists:method,id',
                 'address_id'        => 'nullable|integer' ,
                 'order_time'        => 'nullable|timestamp',
+                'note'              => 'sometimes|string' ,
             ]);
             
             $user = auth('customer')->user();
