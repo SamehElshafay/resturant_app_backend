@@ -11,6 +11,7 @@ use App\Models\OrdersModels\OrderAddress;
 use App\Models\OrdersModels\OrderItem;
 use App\Models\OrdersModels\OrderItemOption;
 use App\Models\OrdersModels\OrderState;
+use App\Models\OrdersModels\OtherUser;
 use App\Models\ProductsModel\Product;
 use App\Models\ProductsModel\ProductModifierOptions;
 use App\Traits\TransactionResponse;
@@ -308,17 +309,19 @@ class CartsController extends Controller {
     public function checkout(Request $request){
         return $this->transactionResponse(function () use ($request) {
             $validated = $request->validate([
-                'phone_number'      => 'sometimes|string',
+                'other_user'        => 'sometimes|array' ,
+                'other_user.phone_number'      => 'sometimes|string',
+                'other_user.user_name'         => 'sometimes|string',
+                'other_user.address'           => 'nullable|integer' ,
+                
                 'payment_method_id' => 'required|string|exists:method,id',
                 'address_id'        => 'nullable|integer' ,
-                'lng'               => 'required|numeric' ,
-                'lat'               => 'required|numeric' ,
-                'city'              => 'required|string'  ,
-                'street_name'       => 'required|string'  ,
-                'zone_id'           => 'required|integer' ,
+                'street_name'       => 'nullable|string'  ,
+                'zone_id'           => 'nullable|integer' ,
                 'building_number'   => 'nullable|string'  ,
                 'floor_number'      => 'nullable|string'  ,
                 'apartment_number'  => 'nullable|string'  ,
+                'note'              => 'nullable|string'
             ]);
             
             $user = auth('customer')->user();
@@ -333,11 +336,6 @@ class CartsController extends Controller {
             $cart->delivery_price = 20 ;
             $cart->save();
             
-            $phone_number = $user->phone_number ;
-
-            if($validated['phone_number'] != null){
-                $phone_number = $validated['phone_number'];
-            }
 
             $order = Order::create([
                 'user_id' => $user->id,
@@ -346,24 +344,20 @@ class CartsController extends Controller {
                 'delivery_price' => $cart->delivery_price ,
                 'services' => $cart->services ,
                 'coupon_id' => $cart->coupon_id ,
-                'phoneNumber' => $phone_number ,
+                'phoneNumber' => $user->phone_number ,
                 'discount' => $cart->total_discount ,
                 'payment_method_id' => $validated['payment_method_id'],
+                'note' => $validated['note'] ,
             ]);
 
             $orderAddress = null ;
             
             if($request->address_id == null){
-                $orderAddress = OrderAddress::create([
+                OtherUser::create([
                     'order_id' => $order->id ,
-                    'zone_id' => $request->zone_id ,
-                    'lng' => $request->lng ,
-                    'lat' => $request->lat ,
-                    'city' => $request->city ,
-                    'street_name' => $request->street_name ,
-                    'building_number' => $request->building_number ,
-                    'floor_number' => $request->floor_number ,
-                    'apartment_number' => $request->apartment_number 
+                    'phone_number' => $validated['other_user']['phone_number'] ,
+                    'address' => $validated['other_user']['address'] ,
+                    'user_name' => $validated['other_user']['user_name'] ,
                 ]);
             }else{
                 $address = Address::find($request->address_id);

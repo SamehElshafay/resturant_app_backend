@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomerModel\Address;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-use function PHPUnit\Framework\isEmpty;
 
 class AddressController extends Controller {
     public function index() {

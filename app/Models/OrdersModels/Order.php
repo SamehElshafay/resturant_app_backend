@@ -42,7 +42,7 @@ class Order extends Model
         'updated_at' => 'datetime',
     ];
 
-    protected $with = ['payment_method'] ;
+    protected $with = ['payment_method' , 'other_user'] ;
 
     public function orderStates(){
         return $this->hasMany(OrderState::class, 'order_id');
@@ -66,6 +66,10 @@ class Order extends Model
 
     public function orderItems(){
         return $this->hasMany(OrderItem::class, 'order_id');
+    }
+    
+    public function other_user(){
+        return $this->hasOne(OtherUser::class, 'order_id');
     }
 
     /*// العلاقة مع Driver
