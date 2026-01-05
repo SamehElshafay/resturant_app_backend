@@ -114,7 +114,7 @@ class AddressController extends Controller {
             
             $user = JWTAuth::parseToken()->authenticate();
 
-            if(!isEmpty($request->defaultCase) && $request->defaultCase == true)
+            if($request->defaultCase != null && $request->defaultCase == true)
                 Address::where('customer_id' , $user->id)->update(['defaultCase' => false]);
 
             $address->update($validated);
