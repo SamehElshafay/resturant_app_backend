@@ -22,6 +22,7 @@ class Order extends Model
         'delivery_price',
         'arrive_time',
         'services',
+        'order_time',
         'driver_id',
         'commercial_place_id',
         'total_recipt',

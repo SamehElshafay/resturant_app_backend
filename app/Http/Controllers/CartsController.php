@@ -312,16 +312,10 @@ class CartsController extends Controller {
                 'other_user'        => 'sometimes|array' ,
                 'other_user.phone_number'      => 'sometimes|string',
                 'other_user.user_name'         => 'sometimes|string',
-                'other_user.address'           => 'nullable|integer' ,
-                
+                'other_user.address'           => 'sometimes|integer' ,
                 'payment_method_id' => 'required|string|exists:method,id',
                 'address_id'        => 'nullable|integer' ,
-                'street_name'       => 'nullable|string'  ,
-                'zone_id'           => 'nullable|integer' ,
-                'building_number'   => 'nullable|string'  ,
-                'floor_number'      => 'nullable|string'  ,
-                'apartment_number'  => 'nullable|string'  ,
-                'note'              => 'nullable|string'
+                'order_time'        => 'nullable|timestamp',
             ]);
             
             $user = auth('customer')->user();
@@ -336,7 +330,6 @@ class CartsController extends Controller {
             $cart->delivery_price = 20 ;
             $cart->save();
             
-
             $order = Order::create([
                 'user_id' => $user->id,
                 'total_value' => $cart->cart_items->sum('total_price') ,
@@ -348,6 +341,7 @@ class CartsController extends Controller {
                 'discount' => $cart->total_discount ,
                 'payment_method_id' => $validated['payment_method_id'],
                 'note' => $validated['note'] ,
+                'order_time' => $validated['order_time'] ,
             ]);
 
             $orderAddress = null ;
