@@ -191,6 +191,10 @@ Route::prefix('admin')->group(function () {
         Route::delete('{id}', [AppointmentController::class, 'destroy']);
     });
 
+    Route::prefix('zones')->group(function () {
+        Route::get('/', [ZoneController::class, 'index']);
+    });
+    
     Route::apiResource('coupons', CouponController::class);
 });
 
