@@ -194,7 +194,7 @@ Route::prefix('admin')->group(function () {
     Route::prefix('zones')->group(function () {
         Route::get('/', [ZoneController::class, 'index']);
     });
-    
+
     Route::apiResource('coupons', CouponController::class);
 });
 
@@ -282,6 +282,10 @@ Route::prefix('customer')->group(function () {
 
     Route::prefix('zones')->group(function () {
         Route::get('/', [ZoneController::class, 'index']);
+    });
+
+    Route::prefix('multiOffers')->group(function () {
+        Route::get('/{id}', [MultiOfferController::class, 'show']);
     });
 });
 

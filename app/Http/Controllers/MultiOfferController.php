@@ -146,7 +146,7 @@ class MultiOfferController extends Controller
     }
 
     public function show($id){
-        return $this->tryCatchBody(function () use ($id) {
+        return $this->transactionResponse(function () use ($id) {
             return MultiOffer::with('offer_products.product')->findOrFail($id);
         });
     }
