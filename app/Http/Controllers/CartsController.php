@@ -315,7 +315,7 @@ class CartsController extends Controller {
                 'other_user.address'           => 'sometimes|string' ,
                 'payment_method_id' => 'required|integer|exists:method,id',
                 'address_id'        => 'sometimes|integer' ,
-                'time_order'        => 'sometimes|timestamp',
+                'time_order'        => 'sometimes|date',
                 'note'              => 'sometimes|string' ,
             ]);
             
