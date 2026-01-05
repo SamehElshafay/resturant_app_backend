@@ -48,7 +48,7 @@ class CommercialPlaceController extends Controller {
     public function show($id){
         try {
             $place = CommercialPlace::findOrFail($id)->load([
-                'allCategoriesOfCommercialPlace',
+                'categories',
                 'location',
                 'commission',
                 'images',
