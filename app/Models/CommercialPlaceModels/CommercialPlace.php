@@ -51,7 +51,7 @@ class CommercialPlace extends Model {
         return $this->hasMany(PhoneNumbers::class, 'commercial_place_id');
     }
 
-    public function locations(){
+    public function location(){
         return $this->hasOne(Location::class, 'commercial_place_id');
     }
 

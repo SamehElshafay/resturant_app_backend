@@ -25,7 +25,7 @@ class CommercialPlaceController extends Controller {
                 'name' => 'sometimes|string',
             ]);
 
-            $places = CommercialPlace::with(['phoneNumbers','locations','images','commission'])
+            $places = CommercialPlace::with(['phoneNumbers','location','images','commission'])
                 ->when($request->name, function ($q) use ($request) {
                     $q->where('name', 'like', '%' . $request->name . '%');
                 })
@@ -52,7 +52,7 @@ class CommercialPlaceController extends Controller {
         try {
             $place = CommercialPlace::findOrFail($id)->load([
                 'categories',
-                'locations',
+                'location',
                 'commission',
                 'images',
                 'appointment' ,
@@ -142,18 +142,18 @@ class CommercialPlaceController extends Controller {
         }
     }
 
-
     public function store(Request $request){
         DB::beginTransaction();
         try {
             $validated = $request->validate([
                 'name'        => 'required|string|max:255',
 
-                
-                'address' => 'required|string',
-                'lat' => 'required|numeric',
-                'lang' => 'required|numeric',
-                'zone_id' => 'required|integer|exists:zone,id',
+                'location' => 'required|array',
+                'location.address' => 'required|string',
+                'location.lat' => 'required|numeric',
+                'location.lang' => 'required|numeric',
+                'location.zone_id' => 'required|integer|exists:zone,id',
+
 
                 'phoneNumbers' => 'required|array',
                 'phoneNumbers.*' => 'string',
@@ -185,10 +185,10 @@ class CommercialPlaceController extends Controller {
 
             Location::create([
                 'commercial_place_id' => $place->id,
-                'lat' => $validated['lat'],
-                'lang' => $validated['lang'],
-                'address' => $validated['address'],
-                'zone_id' => $validated['zone_id'],
+                'address' => $validated['location']['address'],
+                'lat'     => $validated['location']['lat'],
+                'lang'    => $validated['location']['lang'],
+                'zone_id' => $validated['location']['zone_id'],
             ]);
 
 
@@ -257,12 +257,13 @@ class CommercialPlaceController extends Controller {
             $validated = $request->validate([
                 'name'                => 'sometimes|string|max:255',
                 'locations'           => 'sometimes|array',
-                
-                'address_id'          => 'sometimes|integer|exists:location,id',
-                'lat'                 => 'sometimes|numeric',
-                'lang'                => 'sometimes|numeric',
-                'address'             => 'sometimes|string|max:255',
-                'zone_id'             => 'sometimes|integer|exists:zone,id',
+
+                'location' => 'sometimes|array',
+                'location.address_id' => 'sometimes|integer',
+                'location.address' => 'sometimes|string',
+                'location.lat' => 'sometimes|numeric',
+                'location.lang' => 'sometimes|numeric',
+                'location.zone_id' => 'sometimes|integer|exists:zone,id',
 
                 'phoneNumbers'        => 'sometimes|array',
                 'phoneNumbers.*'      => 'string',
@@ -345,30 +346,10 @@ class CommercialPlaceController extends Controller {
                 );
             }
 
-            if ($request->has('locations')) {
-                $incomingIds = collect($request->locations)->pluck('id')->filter()->toArray();
-                $place->locations()->whereNotIn('id', $incomingIds)->delete();
-
-                
-                foreach ($request->locations as $locData) {
-                    if (isset($locData['id'])) {
-                        $location = $place->locations()->find($locData['id']);
-                        if ($location) {
-                            $location->update([
-                                'lat' => $locData['lat'] ?? $location->lat,
-                                'lang' => $locData['lang'] ?? $location->lang,
-                                'address' => $locData['address'] ?? $location->address,
-                            ]);
-                        }
-                    } else {
-                        $place->locations()->create([
-                            'lat' => $locData['lat'] ?? null,
-                            'lang' => $locData['lang'] ?? null,
-                            'address' => $locData['address'] ?? null,
-                        ]);
-                    }
-                }
+            if ($request->has('location')) {
+                Location::find($request->location['id'])->update($request->location);
             }
+
 
             if ($request->has('phone_numbers')) {
                 PhoneNumbers::where('commercial_place_id', $place->id)->delete();
