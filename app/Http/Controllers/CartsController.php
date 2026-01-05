@@ -342,7 +342,7 @@ class CartsController extends Controller {
                 'discount' => $cart->total_discount ,
                 'payment_method_id' => $validated['payment_method_id'],
                 'note' => $validated['note'] ,
-                'order_time' => $validated['time_order'] ,
+                'time_order' => $validated['time_order'] ,
             ]);
 
             $orderAddress = null ;
