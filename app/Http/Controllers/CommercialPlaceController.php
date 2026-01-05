@@ -282,7 +282,7 @@ class CommercialPlaceController extends Controller {
             ]);
             
             if ($request->has('categories_ids')) {
-                $categoryIds = collect($request->deleted_categories_ids)->filter()->unique()->values()->toArray();
+                $categoryIds = collect($request->categories_ids)->filter()->unique()->values()->toArray();
                 foreach ($categoryIds as $categoryId) {
                     CommercialCategory::create([
                         'commercial_place_id' => $place->id,
