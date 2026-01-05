@@ -313,7 +313,7 @@ class CartsController extends Controller {
                 'other_user.phone_number'      => 'sometimes|string',
                 'other_user.user_name'         => 'sometimes|string',
                 'other_user.address'           => 'sometimes|string' ,
-                'payment_method_id' => 'required|string|exists:method,id',
+                'payment_method_id' => 'required|integer|exists:method,id',
                 'address_id'        => 'nullable|integer' ,
                 'order_time'        => 'nullable|timestamp',
             ]);
