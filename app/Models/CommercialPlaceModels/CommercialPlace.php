@@ -126,7 +126,7 @@ class CommercialPlace extends Model {
         ];
     }
 
-    public function categories(){
+    public function allCategoriesOfCommercialPlace(){
         return $this->hasManyThrough(
             Category::class,
             CommercialCategory::class,
@@ -135,5 +135,9 @@ class CommercialPlace extends Model {
             'id',
             'category_id'
         );
+    }
+
+    public function categories(){
+        return $this->hasMany(CommercialCategory::class, 'commercial_place_id');
     }
 }
