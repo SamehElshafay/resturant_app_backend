@@ -49,15 +49,15 @@ return [
         'admins' => [
             'provider' => 'admins',
             'table' => 'password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60,
+            'expire' => 10000,
+            'throttle' => 10000,
         ],
 
         'customers' => [
             'provider' => 'customers',
             'table' => 'password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60,
+            'expire' => 10000,
+            'throttle' => 10000,
         ],
     ],
 
