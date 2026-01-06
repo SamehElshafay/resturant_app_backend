@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryModels\Category;
 use App\Models\CategoryModels\CommercialCategory;
+use App\Services\ImagesServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -59,7 +60,8 @@ class CategoryController extends Controller
         ]);
 
         if ($request->hasFile('image_path')) {
-            $validated['image_path'] = $request->file('image_path')->store('categories', 'public');
+             //= $request->file('image_path')->store('categories', 'public');
+            $validated['image_path'] = ImagesServices::uploadImage('categories' , $request->file('image_path')) ;
         }
 
         $category = Category::create($validated);
@@ -82,10 +84,8 @@ class CategoryController extends Controller
             ]);
 
             if ($request->hasFile('image_path')) {
-                if ($category->image_path && Storage::disk('public')->exists($category->image_path)) {
-                    Storage::disk('public')->delete($category->image_path);
-                }
-                $validated['image_path'] = $request->file('image_path')->store('categories', 'public');
+                ImagesServices::deleteImage($category->image_path);
+                $validated['image_path'] = ImagesServices::uploadImage('categories' , $request->file('image_path')) ;
             }
 
             $category->update($validated);

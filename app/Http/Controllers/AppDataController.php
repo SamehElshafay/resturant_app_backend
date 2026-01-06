@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\AppData\Banners;
 use App\Models\CustomerModel\Address;
+use App\Services\ImagesServices;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -52,7 +53,7 @@ class AppDataController extends Controller {
                 'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
             ]);
 
-            $path = $request->file('image')->store('banners', 'public');
+            $path = ImagesServices::uploadImage('banners' , $request->file('image')) ;
 
             $banner = Banners::create([
                 'path' => $path,
@@ -72,8 +73,7 @@ class AppDataController extends Controller {
         }
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
         try {
             $banner = Banners::findOrFail($id);
 
@@ -85,7 +85,6 @@ class AppDataController extends Controller {
                 if ($banner->path && Storage::disk('public')->exists($banner->path)) {
                     Storage::disk('public')->delete($banner->path);
                 }
-
                 $banner->path = $request->file('image')->store('banners', 'public');
             }
 

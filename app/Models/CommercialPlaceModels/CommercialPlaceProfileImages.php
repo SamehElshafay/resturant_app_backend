@@ -27,7 +27,7 @@ class CommercialPlaceProfileImages extends Model
     protected $appends = ['full_path'];
 
     public function getFullPathAttribute(){
-        return asset('storage/' . $this->path);
+        return url($this->image_path);
     }
 
 }

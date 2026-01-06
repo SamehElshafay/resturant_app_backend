@@ -77,8 +77,10 @@ class ProductController extends Controller
             'commercial_place_id' => 'required|integer|exists:commercial_place,id',
             'note'                => 'required|nullable|string',
             'preparation_time'    => 'required|integer',
+            
             'images'              => 'required|array',
             'images.*'            => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+
             'modifiers'                       => 'sometimes|array',
             'modifiers.*.modifier_id'         => 'required|integer|exists:modifiers,id',
             'modifiers.*.options'             => 'required|array',
@@ -93,7 +95,6 @@ class ProductController extends Controller
                 foreach ($request->file('images') as $img) {
                     $path = ImagesServices::uploadImage('products' , $img ) ;
                     //$path = $img->store('products', 'public');
-                    echo $path ;
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $path
@@ -169,17 +170,15 @@ class ProductController extends Controller
                     ->get();
 
                 foreach ($imagesToDelete as $image) {
-                    if (Storage::disk('public')->exists($image->image_path)) {
-                        Storage::disk('public')->delete($image->image_path);
-                    }
+                    ImagesServices::deleteImage($image->image_path);
                     $image->delete();
                 }
             }
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $img) {
-                    $path = $img->store('products', 'public');
-
+                    //$path = $img->store('products', 'public');
+                    $path = ImagesServices::uploadImage('products' , $img) ;
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $path,

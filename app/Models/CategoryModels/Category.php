@@ -31,7 +31,7 @@ class Category extends Model
     ];
 
     public function getImageFullPathAttribute(){
-        return asset('storage/'.$this->image_path);
+        return url($this->image_path);
     }
 
     public function scopeSearch($query, $name = null, $parentId = null){

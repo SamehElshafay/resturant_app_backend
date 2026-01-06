@@ -11,6 +11,7 @@ use App\Models\CommercialPlaceModels\Location;
 use App\Models\CommercialPlaceModels\PhoneNumbers;
 use App\Models\CustomerModel\FavoritePlace;
 use App\Models\ProductsModel\Product;
+use App\Services\ImagesServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -206,9 +207,9 @@ class CommercialPlaceController extends Controller {
                     ]);
                 }
             }
+
             
-            $img = $request->file('profile_image');
-            $path = $img->store('commercial_places', 'public');
+            $path = ImagesServices::uploadImage('commercial_places' , $request->file('profile_image')) ;
             
             $profile_image = CommercialPlaceProfileImages::create([
                 'commercial_place_id' => $place->id,
@@ -220,7 +221,7 @@ class CommercialPlaceController extends Controller {
             
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $img) {
-                    $path = $img->store('commercial_places', 'public');
+                    $path = ImagesServices::uploadImage('commercial_places' , $img);
                     CommercialPlaceImages::create([
                         'commercial_place_id' => $place->id,
                         'path' => $path
@@ -312,7 +313,7 @@ class CommercialPlaceController extends Controller {
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
-                    $path = $image->store('commercial_places', 'public');
+                    $path = ImagesServices::uploadImage('commercial_places' , $image) ;
                     CommercialPlaceImages::create([
                         'commercial_place_id' => $place->id,
                         'path' => $path,
@@ -321,9 +322,7 @@ class CommercialPlaceController extends Controller {
             }
 
             if ($request->has('deleted_images')) {
-                $imagesToDelete = CommercialPlaceImages::where('commercial_place_id', $place->id)
-                    ->whereIn('id', $request->deleted_images)
-                    ->get();
+                $imagesToDelete = CommercialPlaceImages::where('commercial_place_id', $place->id)->whereIn('id', $request->deleted_images)->get();
 
                 foreach ($imagesToDelete as $img) {
                     Storage::disk('public')->delete($img->path);
@@ -358,15 +357,10 @@ class CommercialPlaceController extends Controller {
 
             
             if ($request->hasFile('profile_image')) {
-                
-                $file = $request->file('profile_image');
-                $path = $file->store('commercial_places/profile', 'public');
-
+                $path = ImagesServices::uploadImage('commercial_places' , $request->file('profile_image')) ;
                 $profileImage = CommercialPlaceProfileImages::where('commercial_place_id' , $place->id)->get()->first() ;
-
                 if ($profileImage) {
-                    Storage::disk('public')->delete($profileImage->path);
-
+                    ImagesServices::deleteImage($profileImage->path);
                     $profileImage->update([
                         'path' => $path,
                     ]);

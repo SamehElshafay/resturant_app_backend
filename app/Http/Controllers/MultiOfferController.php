@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CommercialPlaceModels\MultiOffer;
 use App\Models\CommercialPlaceModels\OfferProduct;
+use App\Services\ImagesServices;
 use App\Traits\TransactionResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +27,9 @@ class MultiOfferController extends Controller
                 'products.*'          => 'exists:product,id',
             ]);
 
-            $imagePath = $request->file('image_path')->store('offers', 'public');
+            //$imagePath = $request->file('image_path')->store('offers', 'public');
+
+            $imagePath = ImagesServices::uploadImage('offers' , $request->file('image_path')) ;
 
             $offer = MultiOffer::create([
                 'offer_name'          => $data['offer_name'],
@@ -66,11 +69,10 @@ class MultiOfferController extends Controller
             $offer = MultiOffer::findOrFail($data['id']);
 
             if ($request->hasFile('image_path')) {
-                if ($offer->image_path && Storage::disk('public')->exists($offer->image_path)) {
-                    Storage::disk('public')->delete($offer->image_path);
-                }
+                ImagesServices::deleteImage($offer->image_path);
 
-                $data['image_path'] = $request->file('image_path')->store('offers', 'public');
+                $data['image_path'] = ImagesServices::uploadImage('offers' , $request->file('image_path')) ;
+                 //= $request->file('image_path')->store('offers', 'public');
             }
 
             $offer->update($data);
