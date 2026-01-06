@@ -9,6 +9,7 @@ use App\Models\ProductsModel\Product;
 use App\Models\ProductsModel\ProductImage;
 use App\Models\ProductsModel\ProductModifier;
 use App\Models\ProductsModel\ProductModifierOptions;
+use App\Services\ImagesServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -90,7 +91,8 @@ class ProductController extends Controller
             $product = Product::create($validated);
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $img) {
-                    $path = $img->store('products', 'public');
+                    $path = ImagesServices::uploadImage('products' , $img ) ;
+                    //$path = $img->store('products', 'public');
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $path
