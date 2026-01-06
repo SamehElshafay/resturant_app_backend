@@ -1,0 +1,2757 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jan 06, 2026 at 03:25 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `delivery_app`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `address`
+--
+
+CREATE TABLE `address` (
+  `id` int(11) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `zone_id` int(11) NOT NULL,
+  `lng` double DEFAULT NULL,
+  `lat` double DEFAULT NULL,
+  `city` varchar(200) DEFAULT NULL,
+  `street_name` varchar(200) DEFAULT NULL,
+  `building_number` varchar(50) DEFAULT NULL,
+  `floor_number` varchar(50) DEFAULT NULL,
+  `apartment_number` varchar(50) DEFAULT NULL,
+  `defaultCase` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `address`
+--
+
+INSERT INTO `address` (`id`, `name`, `customer_id`, `zone_id`, `lng`, `lat`, `city`, `street_name`, `building_number`, `floor_number`, `apartment_number`, `defaultCase`, `created_at`, `updated_at`) VALUES
+(1, 'Home', 1, 1, 31.2357, 30.0444, 'Giza', 'Tahrir', '12', '3', '6', 0, '2026-01-04 23:26:30', '2025-12-12 21:38:27'),
+(2, 'البيت', 9, 2, 31.456, 30.223, 'القاهرة', 'مكرم عبيد', '12', '3', '7', 0, '2026-01-04 23:26:30', '2025-12-29 22:54:54'),
+(3, 'البيت', 9, 3, 31.456, 30.323, 'القاهرة', 'مكرم عبيد', '12', '3', '7', 0, '2026-01-04 23:26:30', '2025-12-29 22:54:54'),
+(4, 'البيت', 9, 4, 31.456, 30.123, 'القاهرة', 'مكرم عبيد', '12', '3', '7', 1, '2026-01-04 23:26:30', '2025-12-29 22:54:54');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `id` int(11) NOT NULL,
+  `name` varchar(1000) NOT NULL,
+  `email` varchar(1000) NOT NULL,
+  `password` varchar(1000) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `FCM_token` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin`
+--
+
+INSERT INTO `admin` (`id`, `name`, `email`, `password`, `role_id`, `FCM_token`, `created_at`, `updated_at`) VALUES
+(1, 'samehelshafay', 'samehelshafay142@gmail.com', '$2y$12$yr4CHLsMplHorvsjfyDaWuTd.Owf1zv9AD2PjmA0KM767IhtOfPFG', 1, NULL, '2025-12-10 14:44:03', '2025-12-10 12:44:03'),
+(15, 'sameh5', 'samehelshafay142.5@gmail.com', '$2y$12$nYHtSIv9yyMRw7i6bmjLvO9EeS3YIIAK9cW.omaQR2w0AJPORtd2.', 1, NULL, '2025-12-10 12:45:05', '2025-12-10 12:45:05'),
+(17, 'sameh5', 'samehelshafay142.8@gmail.com', '$2y$12$pCdGc7g1P6FYSKeuM9QwCOhyL1O44yhKRRH2A5fKnMISHIJOrslyy', 1, NULL, '2025-12-10 16:27:21', '2025-12-10 16:27:21'),
+(18, 'admin5000', 'admin22@gmail.com', '$2y$12$0KEMTXP9smezbgdpRUCrr.vKDzj164ExNp4PV/WVa4mFzY/FPyuE2', 3, NULL, '2026-01-01 20:21:27', '2026-01-02 01:21:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `appointments`
+--
+
+CREATE TABLE `appointments` (
+  `id` int(11) NOT NULL,
+  `open_time` time NOT NULL,
+  `close_time` time NOT NULL,
+  `day_name` varchar(50) NOT NULL,
+  `commercial_place` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `appointments`
+--
+
+INSERT INTO `appointments` (`id`, `open_time`, `close_time`, `day_name`, `commercial_place`, `created_at`, `updated_at`) VALUES
+(1, '09:00:00', '22:00:00', 'Monday', 1, '2026-01-01 17:07:14', '2026-01-01 17:07:14'),
+(2, '09:00:00', '22:00:00', 'Monday', 1, '2026-01-01 17:12:10', '2026-01-01 17:12:10'),
+(3, '09:00:00', '22:00:00', 'Tuesday', 1, '2026-01-01 17:12:10', '2026-01-01 17:12:10'),
+(4, '09:00:00', '22:00:00', 'Wednesday', 1, '2026-01-01 17:12:10', '2026-01-01 17:12:10'),
+(5, '09:00:00', '22:00:00', 'Thursday', 1, '2026-01-01 17:12:10', '2026-01-01 17:12:10'),
+(6, '09:00:00', '22:00:00', 'Friday', 1, '2026-01-01 17:12:10', '2026-01-01 17:12:10'),
+(7, '09:00:00', '22:00:00', 'Saturday', 1, '2026-01-01 17:12:10', '2026-01-01 17:12:10'),
+(8, '09:00:00', '22:00:00', 'Sunday', 1, '2026-01-01 17:12:10', '2026-01-01 17:12:10');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `audit_logs`
+--
+
+CREATE TABLE `audit_logs` (
+  `id` int(11) NOT NULL,
+  `table_name` varchar(255) NOT NULL,
+  `record_id` int(11) NOT NULL,
+  `action` varchar(50) NOT NULL,
+  `performed_by` int(11) DEFAULT NULL,
+  `performed_at` datetime NOT NULL,
+  `old_data` text DEFAULT NULL,
+  `new_data` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `banners`
+--
+
+CREATE TABLE `banners` (
+  `id` int(11) NOT NULL,
+  `path` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `banners`
+--
+
+INSERT INTO `banners` (`id`, `path`, `created_at`, `updated_at`) VALUES
+(1, 'banners/majNDWdAMTqCCqcRHcE0PjAc1rM1UzWg7D6gxxDD.png', '2025-12-18 01:47:02', '2025-12-18 01:47:02');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cache`
+--
+
+CREATE TABLE `cache` (
+  `key` varchar(255) NOT NULL,
+  `value` mediumtext NOT NULL,
+  `expiration` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('laravel-cache-OteZVFwAGxOFE3lM', 's:7:\"forever\";', 2082078373);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cache_locks`
+--
+
+CREATE TABLE `cache_locks` (
+  `key` varchar(255) NOT NULL,
+  `owner` varchar(255) NOT NULL,
+  `expiration` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `campaigns`
+--
+
+CREATE TABLE `campaigns` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `card_payment`
+--
+
+CREATE TABLE `card_payment` (
+  `id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `card_number` varchar(16) NOT NULL,
+  `holder_name` varchar(100) NOT NULL,
+  `expire_date_month` varchar(2) NOT NULL,
+  `expire_date_year` varchar(2) NOT NULL,
+  `cvv` varchar(3) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `carts`
+--
+
+CREATE TABLE `carts` (
+  `id` int(11) NOT NULL,
+  `customer_id` int(11) DEFAULT NULL,
+  `commercial_id` int(11) DEFAULT NULL,
+  `coupon_id` int(11) DEFAULT NULL,
+  `services` double NOT NULL DEFAULT 0,
+  `delivery_price` double DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `carts`
+--
+
+INSERT INTO `carts` (`id`, `customer_id`, `commercial_id`, `coupon_id`, `services`, `delivery_price`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, NULL, 0, 0, '2026-01-04 17:44:44', '2025-12-15 11:33:05'),
+(2, 9, NULL, NULL, 0, 0, '2026-01-04 19:32:05', '2026-01-04 17:32:05'),
+(6, 13, 1, NULL, 0, 0, '2026-01-04 17:44:48', '2025-12-24 16:01:16'),
+(7, 14, 1, NULL, 0, 0, '2026-01-04 17:44:50', '2025-12-25 16:26:14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart_items`
+--
+
+CREATE TABLE `cart_items` (
+  `id` int(11) NOT NULL,
+  `cart_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `qty` int(11) DEFAULT NULL,
+  `unit_price` decimal(10,2) DEFAULT NULL,
+  `total_price` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cart_items`
+--
+
+INSERT INTO `cart_items` (`id`, `cart_id`, `product_id`, `qty`, `unit_price`, `total_price`, `created_at`, `updated_at`) VALUES
+(1, 1, 11, 3, 110.00, 330.00, '2025-12-15 13:33:05', '2025-12-15 11:33:05'),
+(8, 1, 11, 3, 110.00, 513.00, '2025-12-16 01:20:45', '2025-12-15 23:20:45'),
+(9, 1, 11, 3, 110.00, 513.00, '2025-12-16 01:21:32', '2025-12-15 23:21:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart_item_options`
+--
+
+CREATE TABLE `cart_item_options` (
+  `id` int(11) NOT NULL,
+  `cart_item_id` int(11) NOT NULL,
+  `modifier_option_id` int(11) NOT NULL,
+  `price` double NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cart_item_options`
+--
+
+INSERT INTO `cart_item_options` (`id`, `cart_item_id`, `modifier_option_id`, `price`, `created_at`, `updated_at`) VALUES
+(1, 1, 9, 1, '2025-12-16 01:21:20', '2025-12-15 11:41:17'),
+(2, 1, 6, 60, '2025-12-16 01:21:23', '2025-12-15 11:41:17'),
+(3, 8, 9, 1, '2025-12-15 23:20:45', '2025-12-15 23:20:45'),
+(4, 8, 6, 60, '2025-12-15 23:20:45', '2025-12-15 23:20:45'),
+(5, 9, 9, 1, '2025-12-15 23:21:32', '2025-12-15 23:21:32'),
+(6, 9, 6, 60, '2025-12-15 23:21:32', '2025-12-15 23:21:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `category`
+--
+
+CREATE TABLE `category` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `image_path` varchar(512) DEFAULT NULL,
+  `parent_category_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `category`
+--
+
+INSERT INTO `category` (`id`, `name`, `image_path`, `parent_category_id`, `created_at`, `updated_at`) VALUES
+(1, 'category1', 'categories/UvEyum10pkOAzaI3CiuG8WVTWnjb0SHpEx5wJTXL.png', 2, '2025-12-12 23:01:21', '2025-12-11 13:29:28'),
+(2, 'category10', 'categories/BfNn4PzaxJorhkcKc3shwxBmgJVqYOo4bOg5HGAx.png', 2, '2025-12-12 23:01:25', '2025-12-11 13:38:34'),
+(3, 'category3', 'categories/uUODnG6bsgqrtp8YaIaZ2Me5txD3dFHwnVY4fkRa.png', 2, '2025-12-12 23:01:29', '2025-12-11 13:32:21'),
+(4, 'pizza', 'categories/wPMARlPmp5POuiorcqisUZVsammlsSy3XPasJZC2.png', 2, '2025-12-14 18:35:46', '2025-12-14 18:35:46'),
+(5, 'Burgers', 'categories/euluptg5aSJObdejvbj3Ce36eRFH20ZHWLhUB3ev.png', 2, '2025-12-14 22:26:27', '2025-12-14 22:26:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `commercial_category`
+--
+
+CREATE TABLE `commercial_category` (
+  `id` int(11) NOT NULL,
+  `commercial_place_id` int(11) DEFAULT NULL,
+  `category_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `commercial_category`
+--
+
+INSERT INTO `commercial_category` (`id`, `commercial_place_id`, `category_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '2026-01-02 15:33:50', '2026-01-02 15:33:50'),
+(2, 1, 2, '2026-01-02 15:33:50', '2026-01-02 15:33:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `commercial_place`
+--
+
+CREATE TABLE `commercial_place` (
+  `id` int(11) NOT NULL,
+  `profile_image_id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `parent_category_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `commercial_place`
+--
+
+INSERT INTO `commercial_place` (`id`, `profile_image_id`, `name`, `parent_category_id`, `created_at`, `updated_at`) VALUES
+(1, 0, 'بـلبن', 2, '2026-01-05 16:47:24', '2025-12-11 02:07:48'),
+(2, 0, 'عم شلتت', 2, '2026-01-05 16:47:33', '2025-12-11 12:56:58'),
+(10, 0, 'بازوكا', 2, '2026-01-05 16:47:42', '2025-12-11 12:16:46'),
+(11, 5, 'العبد', 2, '2026-01-05 16:47:46', '2025-12-17 23:08:42');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `commercial_place_commission`
+--
+
+CREATE TABLE `commercial_place_commission` (
+  `id` int(11) NOT NULL,
+  `commercial_place_id` int(11) NOT NULL,
+  `commission_id` int(11) NOT NULL,
+  `value` double NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `commercial_place_commission`
+--
+
+INSERT INTO `commercial_place_commission` (`id`, `commercial_place_id`, `commission_id`, `value`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 9.5, '2025-12-12 01:06:47', '2025-12-11 23:06:47'),
+(2, 2, 3, 10000, '2025-12-11 23:04:49', '2025-12-11 23:04:49');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `commercial_place_images`
+--
+
+CREATE TABLE `commercial_place_images` (
+  `id` int(11) NOT NULL,
+  `commercial_place_id` int(11) NOT NULL,
+  `path` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `commercial_place_images`
+--
+
+INSERT INTO `commercial_place_images` (`id`, `commercial_place_id`, `path`, `created_at`, `updated_at`) VALUES
+(1, 1, 'commercial_places/2sjjO51jXJF7T38qz3es6sSTaSKxjIxFX2B5Mg7w.png', '2025-12-11 02:07:49', '2025-12-11 02:07:49'),
+(2, 2, 'commercial_places/vEljpnl4shujtbvsVRBxQl1URyYcRii7ABSRZ0Ii.png', '2025-12-11 02:11:25', '2025-12-11 02:11:25'),
+(4, 10, 'commercial_places/mSezXraIKxvfe5n6zoroi9YME5163PJVS4TU80WQ.png', '2025-12-11 12:16:46', '2025-12-11 12:16:46'),
+(5, 11, 'commercial_places/RDz85iUedaJ84yW42SBO2Pc8kXy30TuA35HecVFt.png', '2025-12-17 23:08:42', '2025-12-17 23:08:42'),
+(6, 11, 'commercial_places/AMtzhcfLFu8tNoIpIqr0Oid8qA9bJKeU4UadjaIv.png', '2025-12-17 23:08:42', '2025-12-17 23:08:42');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `commercial_place_profile_images`
+--
+
+CREATE TABLE `commercial_place_profile_images` (
+  `id` int(11) NOT NULL,
+  `commercial_place_id` int(11) NOT NULL,
+  `path` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `commercial_place_profile_images`
+--
+
+INSERT INTO `commercial_place_profile_images` (`id`, `commercial_place_id`, `path`, `created_at`, `updated_at`) VALUES
+(1, 22, 'commercial_places/profile/ITMzLR6z7KzOWAp1kx1jJyT3UcoST3TRHJ4kwRy3.jpg', '2025-12-26 02:37:39', '2025-12-26 00:37:39'),
+(2, 23, 'commercial_places/nTJBoJD3fws490rNp9U0fTzCgv2PDQTXvpK8Umnm.png', '2025-12-26 00:34:51', '2025-12-26 00:34:51'),
+(3, 2, 'commercial_places/profile/GRuUybjUpG4i1D2IfSSPmHazxrr4OU6vPUkHvsha.jpg', '2025-12-26 00:37:02', '2025-12-26 00:37:02'),
+(4, 1, 'commercial_places/profile/Jqgu0tG3S5bJVYpgqBhD7jiZNpyr8o2OwdsxxFo9.png', '2026-01-05 17:26:16', '2026-01-05 15:26:16');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `commission_type`
+--
+
+CREATE TABLE `commission_type` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `commission_type`
+--
+
+INSERT INTO `commission_type` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(2, 'Commission', '2025-12-11 23:01:03', '2025-12-11 23:01:03'),
+(3, 'Monthly Fee', '2025-12-11 23:01:17', '2025-12-11 23:01:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `coupons`
+--
+
+CREATE TABLE `coupons` (
+  `id` int(11) NOT NULL,
+  `code` varchar(50) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `type` enum('fixed','percent','free_delivery') NOT NULL,
+  `value` decimal(10,2) NOT NULL,
+  `min_order_amount` decimal(10,2) DEFAULT NULL,
+  `max_discount` decimal(10,2) DEFAULT NULL,
+  `usage_limit` int(11) DEFAULT NULL,
+  `usage_per_user` int(11) DEFAULT NULL,
+  `used_count` int(11) NOT NULL DEFAULT 0,
+  `start_at` datetime NOT NULL,
+  `expire_at` datetime NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `coupons`
+--
+
+INSERT INTO `coupons` (`id`, `code`, `description`, `type`, `value`, `min_order_amount`, `max_discount`, `usage_limit`, `usage_per_user`, `used_count`, `start_at`, `expire_at`, `active`, `created_at`, `updated_at`) VALUES
+(6, 'WELCOME10', '10% off', 'percent', 10.00, 100.00, 50.00, 100, 1, 0, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 1, '2026-01-04 00:01:13', '2026-01-04 00:01:13'),
+(8, '12345678', '10% off', 'percent', 10.00, 100.00, 50.00, 100, 1, 1, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 1, '2026-01-04 01:04:29', '2026-01-04 01:36:34'),
+(10, '1234567899', '10% off', 'percent', 10.00, 100.00, 50.00, 100, 10, 4, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 1, '2026-01-04 01:40:32', '2026-01-04 01:46:30'),
+(12, '1234567898', '10% off', 'free_delivery', 0.00, 0.00, 0.00, 10, 10, 0, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 1, '2026-01-04 01:50:07', '2026-01-04 01:50:07');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `coupon_usages`
+--
+
+CREATE TABLE `coupon_usages` (
+  `id` int(11) NOT NULL,
+  `coupon_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `used_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `coupon_usages`
+--
+
+INSERT INTO `coupon_usages` (`id`, `coupon_id`, `customer_id`, `order_id`, `used_at`, `created_at`, `updated_at`) VALUES
+(1, 8, 9, NULL, '2026-01-04 05:36:34', '2026-01-04 03:36:34', '2026-01-04 03:36:34'),
+(2, 10, 9, NULL, '2026-01-04 05:40:53', '2026-01-04 03:40:53', '2026-01-04 03:40:53'),
+(4, 10, 9, NULL, '2026-01-04 05:44:54', '2026-01-04 03:44:54', '2026-01-04 03:44:54'),
+(5, 10, 9, NULL, '2026-01-04 05:46:03', '2026-01-04 03:46:03', '2026-01-04 03:46:03'),
+(6, 10, 9, NULL, '2026-01-04 05:46:30', '2026-01-04 03:46:30', '2026-01-04 03:46:30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customer`
+--
+
+CREATE TABLE `customer` (
+  `id` int(11) NOT NULL,
+  `first_name` varchar(200) NOT NULL,
+  `last_name` varchar(200) NOT NULL,
+  `phone_number` varchar(20) NOT NULL,
+  `password` varchar(400) NOT NULL,
+  `image_path` varchar(1000) DEFAULT NULL,
+  `receive_notification` int(11) NOT NULL DEFAULT 1,
+  `verifcation_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `customer`
+--
+
+INSERT INTO `customer` (`id`, `first_name`, `last_name`, `phone_number`, `password`, `image_path`, `receive_notification`, `verifcation_id`, `created_at`, `updated_at`) VALUES
+(1, 'sameh updated', 'elshafay updated', '01281063411', '$2y$12$0hGZOBJsXLaUJimy.4lAGeMFIX.Rs0XZrvFm/OpB94RWg0g1WZTPC', 'customers/6D47KLgFHCdPpVjfOo4ELKaWujG9li3DvTRGTizz.png', 1, 0, '2025-12-12 18:31:28', '2025-12-12 16:31:28'),
+(9, 'Sameh', 'Elshafay', '01500102769', '$2y$12$08vO93Tc3KcnyXIN0w0ip.H5HQveM1GVZfAQSKpi4lqKMakz4lZE2', NULL, 1, 0, '2025-12-30 00:53:30', '2025-12-29 22:53:30'),
+(13, 'sameh', 'elshafay', '01500102768', '$2y$12$r5Ch50avigJ6ba7VRYaPQOH7UQNzhqJYtG3Q38AtSLDjGzDPBgTrK', NULL, 1, 2, '2025-12-24 18:01:16', '2025-12-24 16:01:16'),
+(14, 'sameh', 'elshafay', '012810634111', '$2y$12$3mgEMhaxC9DIDbl0Fl7RTOVRNvLYqpcobxYrtraJnxtn64i7i97nq', NULL, 1, 3, '2025-12-25 18:26:14', '2025-12-25 16:26:14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `discount_type`
+--
+
+CREATE TABLE `discount_type` (
+  `id` int(11) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `type => value , percentage` varchar(100) DEFAULT NULL,
+  `value` float NOT NULL,
+  `operation_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `driver`
+--
+
+CREATE TABLE `driver` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `image_url` varchar(512) DEFAULT NULL,
+  `branch_id` int(11) DEFAULT NULL,
+  `location_id` int(11) DEFAULT NULL,
+  `driver_status` varchar(50) DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `driver_safe`
+--
+
+CREATE TABLE `driver_safe` (
+  `id` int(11) NOT NULL,
+  `branch_creditor_id` int(11) DEFAULT NULL,
+  `driver_debtor_id` int(11) DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `funds_delivered` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `evaluation`
+--
+
+CREATE TABLE `evaluation` (
+  `id` int(11) NOT NULL,
+  `driver_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` int(11) NOT NULL,
+  `comment` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+CREATE TABLE `failed_jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `uuid` varchar(255) NOT NULL,
+  `connection` text NOT NULL,
+  `queue` text NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `favorite_places`
+--
+
+CREATE TABLE `favorite_places` (
+  `id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `commercial_place_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `favorite_products`
+--
+
+CREATE TABLE `favorite_products` (
+  `id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobs`
+--
+
+CREATE TABLE `jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` tinyint(3) UNSIGNED NOT NULL,
+  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
+  `available_at` int(10) UNSIGNED NOT NULL,
+  `created_at` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_batches`
+--
+
+CREATE TABLE `job_batches` (
+  `id` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `total_jobs` int(11) NOT NULL,
+  `pending_jobs` int(11) NOT NULL,
+  `failed_jobs` int(11) NOT NULL,
+  `failed_job_ids` longtext NOT NULL,
+  `options` mediumtext DEFAULT NULL,
+  `cancelled_at` int(11) DEFAULT NULL,
+  `created_at` int(11) NOT NULL,
+  `finished_at` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `location`
+--
+
+CREATE TABLE `location` (
+  `id` int(11) NOT NULL,
+  `zone_id` int(11) NOT NULL,
+  `lat` float NOT NULL,
+  `lang` float NOT NULL,
+  `address` varchar(200) DEFAULT NULL,
+  `commercial_place_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `location`
+--
+
+INSERT INTO `location` (`id`, `zone_id`, `lat`, `lang`, `address`, `commercial_place_id`, `created_at`, `updated_at`) VALUES
+(3, 1, 20.3, 50.22, 'address22222address22222', 1, '2026-01-04 22:56:23', '2025-12-11 02:07:48'),
+(4, 2, 20.3, 50.22, 'address22222address22222', 10, '2026-01-04 22:56:23', '2025-12-11 02:11:25'),
+(14, 6, 31.25, 30.05, 'giza', 11, '2026-01-04 22:56:23', '2025-12-17 23:08:41');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loyalty_points`
+--
+
+CREATE TABLE `loyalty_points` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `points` int(11) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `merchant`
+--
+
+CREATE TABLE `merchant` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `commercial_place_id` int(11) DEFAULT NULL,
+  `password` varchar(500) NOT NULL,
+  `phoneNumber` varchar(20) NOT NULL,
+  `verifcation_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `merchant`
+--
+
+INSERT INTO `merchant` (`id`, `name`, `commercial_place_id`, `password`, `phoneNumber`, `verifcation_id`, `created_at`, `updated_at`) VALUES
+(1, 'sameh', 1, '$2y$12$I8yc9iq1rIGc58jowl15a.ANfqYnxIsmxii.z.iIHioeD5nua8G3u', '01281063411', 0, '2025-12-22 13:43:30', '2025-12-22 11:43:30'),
+(2, 'sameh', NULL, '$2y$12$peEK2FqLU/roZA9UXLsfCeaqMjRbjJ/JyfEEdmyIN3RIYrdos//dm', '01500102769', 0, '2025-12-21 13:38:15', '2025-12-21 13:38:15'),
+(3, 'sameh', NULL, '$2y$12$PkH360b8D60rV/AbWj/j1.wGMuYgpxAdPkq9tSEUpMLgmDZPl93VS', '01500102768', 0, '2025-12-22 00:03:41', '2025-12-22 00:03:41'),
+(4, 'sameh', NULL, '$2y$12$IbGjFOIOMOTTSWbw2yzl2.GmRgivZpacTpf2qveMXu6hDMJmSSCuC', '01500102767', 0, '2025-12-22 00:04:27', '2025-12-22 00:04:27'),
+(6, 'sameh', NULL, '$2y$12$iEEam6SuvDrJmA87THm93OxZLnASIln7iHt4hftM3ACiiwXk2xYN2', '01500102765', 1, '2025-12-22 02:07:51', '2025-12-22 00:07:51'),
+(7, 'sameh', NULL, '$2y$12$aD5nH/Rvv0MRpdtsDk/7qezjd4jjhfqd./f4QSyPshitv.RdNo3DW', '01500102764', NULL, '2025-12-22 00:45:35', '2025-12-22 00:45:35'),
+(8, 'sameh', 10, '$2y$12$Xj3RgH7iyBLGivDrLuhm9u4D73jKfi89BoCxmhU3/TnMx3pKmETJS', '01500102763', 1, '2025-12-22 16:09:53', '2025-12-22 00:46:44'),
+(9, 'Salem', NULL, '$2y$12$v7/ZeuwZMKEbALlblDEeFeI2VPjwW1T69lvAyFcr9soJFBGjVu/C.', '01093967431', 4, '2026-01-01 20:19:53', '2026-01-02 01:19:53');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `method`
+--
+
+CREATE TABLE `method` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `method`
+--
+
+INSERT INTO `method` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(1, 'cash', '2025-12-24 16:28:17', '2025-12-24 16:28:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `migrations`
+--
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `migrations`
+--
+
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
+(1, '0001_01_01_000000_create_users_table', 1),
+(2, '0001_01_01_000001_create_cache_table', 1),
+(3, '0001_01_01_000002_create_jobs_table', 1),
+(4, '2025_12_09_193516_create_personal_access_tokens_table', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `modifiers`
+--
+
+CREATE TABLE `modifiers` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `selection_type` varchar(255) DEFAULT NULL,
+  `is_required` tinyint(1) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `modifiers`
+--
+
+INSERT INTO `modifiers` (`id`, `name`, `selection_type`, `is_required`, `created_at`, `updated_at`) VALUES
+(3, 'Extra Cheese Updated', 'multiple', 0, '2025-12-11 20:38:36', '2025-12-11 18:38:36'),
+(4, 'Size', 'single', 1, '2025-12-14 18:09:52', '2025-12-14 18:09:52'),
+(5, 'Add-ons', 'multiple', 0, '2025-12-14 18:10:34', '2025-12-14 18:10:34'),
+(6, 'Cooking Level', 'single', 0, '2025-12-14 18:10:50', '2025-12-14 18:10:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `modifier_options`
+--
+
+CREATE TABLE `modifier_options` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `modifier_id` int(11) DEFAULT NULL,
+  `is_default` tinyint(1) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `modifier_options`
+--
+
+INSERT INTO `modifier_options` (`id`, `name`, `modifier_id`, `is_default`, `created_at`, `updated_at`) VALUES
+(5, 'Small', 4, 1, '2025-12-26 03:00:46', '2025-12-26 01:00:46'),
+(6, 'Medium', 4, 0, '2025-12-26 03:03:05', '2025-12-26 01:03:05'),
+(7, 'Large', 4, 0, '2025-12-14 18:09:52', '2025-12-14 18:09:52'),
+(8, 'Extra Cheese', 5, 0, '2025-12-14 18:10:34', '2025-12-14 18:10:34'),
+(9, 'Mushroom', 5, 0, '2025-12-14 18:10:34', '2025-12-14 18:10:34'),
+(10, 'Jalapeno', 5, 0, '2025-12-14 18:10:34', '2025-12-14 18:10:34'),
+(11, 'Caramelized Onion', 5, 0, '2025-12-14 18:10:34', '2025-12-14 18:10:34'),
+(12, 'Rare', 6, 0, '2025-12-14 18:10:50', '2025-12-14 18:10:50'),
+(13, 'Medium', 6, 1, '2025-12-14 18:10:50', '2025-12-14 18:10:50'),
+(14, 'Well Done', 6, 0, '2025-12-14 18:10:50', '2025-12-14 18:10:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `multi_offer`
+--
+
+CREATE TABLE `multi_offer` (
+  `id` int(11) NOT NULL,
+  `offer_name` varchar(1000) NOT NULL,
+  `description` text NOT NULL,
+  `price` float NOT NULL,
+  `expire_date` date DEFAULT NULL,
+  `commercial_place_id` int(11) DEFAULT NULL,
+  `image_path` varchar(500) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `multi_offer`
+--
+
+INSERT INTO `multi_offer` (`id`, `offer_name`, `description`, `price`, `expire_date`, `commercial_place_id`, `image_path`, `active`, `created_at`, `updated_at`) VALUES
+(4, 'Family Offer', 'Family combo', 250, '2026-02-01', 1, 'offers/6rKDQ3IKcPYJj12FZq2FVvgoDPvqQgwPV1xHazWw.png', 1, '2026-01-02 13:32:10', '2026-01-02 11:17:05'),
+(5, 'Family Offer', 'Family combo', 250, '2026-02-01', 1, 'offers/wJ3q60a1hlTHZq7OCgUrO7LE8Xg6wW8pZndLLmY2.png', 1, '2026-01-02 13:32:10', '2026-01-02 11:27:35'),
+(6, 'Family Offer', 'Family combo', 250, '2026-02-01', 1, 'offers/jRdskN2jckfcEzHyqZzH7lg1kGoh3CQpOlk8eUOf.png', 1, '2026-01-02 13:40:20', '2026-01-02 11:35:55');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `driver_id` int(11) DEFAULT NULL,
+  `message` text NOT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `receive` tinyint(1) DEFAULT 0,
+  `created_at` datetime NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `offer_product`
+--
+
+CREATE TABLE `offer_product` (
+  `id` int(11) NOT NULL,
+  `offer_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `offer_product`
+--
+
+INSERT INTO `offer_product` (`id`, `offer_id`, `product_id`, `active`, `created_at`, `updated_at`) VALUES
+(1, 2, 9, 1, '2026-01-02 13:31:05', '2026-01-01 16:29:56'),
+(2, 2, 11, 1, '2026-01-02 13:31:05', '2026-01-01 16:29:56'),
+(4, 3, 9, 1, '2026-01-02 13:31:05', '2026-01-01 16:32:18'),
+(5, 3, 11, 1, '2026-01-02 13:31:05', '2026-01-01 16:32:18'),
+(6, 4, 9, 1, '2026-01-02 13:31:05', '2026-01-02 11:17:05'),
+(7, 4, 11, 1, '2026-01-02 13:31:05', '2026-01-02 11:17:05'),
+(8, 5, 9, 1, '2026-01-02 13:31:05', '2026-01-02 11:27:35'),
+(9, 5, 11, 1, '2026-01-02 13:31:05', '2026-01-02 11:27:35'),
+(10, 6, 9, 0, '2026-01-02 11:35:55', '2026-01-02 11:35:55'),
+(11, 6, 11, 0, '2026-01-02 11:35:55', '2026-01-02 11:35:55');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order`
+--
+
+CREATE TABLE `order` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `coupon_id` int(11) DEFAULT NULL,
+  `discount` double DEFAULT 0,
+  `total_value` decimal(10,2) DEFAULT NULL,
+  `delivery_price` double NOT NULL,
+  `arrive_time` datetime DEFAULT NULL,
+  `driver_id` int(11) DEFAULT NULL,
+  `commercial_place_id` int(11) NOT NULL,
+  `note` varchar(255) DEFAULT NULL,
+  `payment_method_id` int(11) NOT NULL DEFAULT 1,
+  `phoneNumber` varchar(50) NOT NULL,
+  `services` double NOT NULL DEFAULT 0,
+  `total_recipt` double NOT NULL DEFAULT 0,
+  `time_order` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order`
+--
+
+INSERT INTO `order` (`id`, `user_id`, `coupon_id`, `discount`, `total_value`, `delivery_price`, `arrive_time`, `driver_id`, `commercial_place_id`, `note`, `payment_method_id`, `phoneNumber`, `services`, `total_recipt`, `time_order`, `created_at`, `updated_at`) VALUES
+(4, 1, NULL, 0, 1356.00, 1, NULL, NULL, 10, NULL, 1, '', 0, 0, NULL, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(7, 9, 10, 50, 2052.00, 0, NULL, NULL, 10, NULL, 1, '01281063411', 0, 0, NULL, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(8, 9, 10, 50, 2052.00, 0, NULL, NULL, 1, NULL, 1, '01281063411', 0, 0, NULL, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(9, 9, 10, 50, 1026.00, 0, NULL, NULL, 10, NULL, 1, '01281063411', 0, 0, NULL, '2026-01-04 17:10:46', '2026-01-04 17:10:46');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_address`
+--
+
+CREATE TABLE `order_address` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `zone_id` int(11) NOT NULL,
+  `lng` double DEFAULT NULL,
+  `lat` double DEFAULT NULL,
+  `city` varchar(200) DEFAULT NULL,
+  `street_name` varchar(200) DEFAULT NULL,
+  `building_number` varchar(50) DEFAULT NULL,
+  `floor_number` varchar(50) DEFAULT NULL,
+  `apartment_number` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `qty` int(11) DEFAULT NULL,
+  `unit_price` decimal(10,2) DEFAULT NULL,
+  `total_price` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_items`
+--
+
+INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `qty`, `unit_price`, `total_price`, `created_at`, `updated_at`) VALUES
+(1, 4, 11, 3, 110.00, 330.00, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(2, 4, 11, 3, 110.00, 513.00, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(3, 4, 11, 3, 110.00, 513.00, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(12, 7, 11, 3, 110.00, 513.00, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(13, 7, 11, 3, 110.00, 513.00, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(14, 7, 11, 3, 110.00, 513.00, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(15, 7, 11, 3, 110.00, 513.00, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(16, 8, 11, 3, 110.00, 513.00, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(17, 8, 11, 3, 110.00, 513.00, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(18, 8, 11, 3, 110.00, 513.00, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(19, 8, 11, 3, 110.00, 513.00, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(20, 9, 11, 3, 110.00, 513.00, '2026-01-04 17:10:46', '2026-01-04 17:10:46'),
+(21, 9, 11, 3, 110.00, 513.00, '2026-01-04 17:10:46', '2026-01-04 17:10:46');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_item_options`
+--
+
+CREATE TABLE `order_item_options` (
+  `id` int(11) NOT NULL,
+  `order_item_id` int(11) NOT NULL,
+  `option_id` int(11) NOT NULL,
+  `price` double NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_item_options`
+--
+
+INSERT INTO `order_item_options` (`id`, `order_item_id`, `option_id`, `price`, `created_at`, `updated_at`) VALUES
+(1, 1, 9, 0, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(2, 1, 6, 0, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(3, 2, 9, 0, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(4, 2, 6, 0, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(5, 3, 9, 0, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(6, 3, 6, 0, '2025-12-24 10:21:31', '2025-12-24 10:21:31'),
+(23, 12, 9, 0, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(24, 12, 6, 0, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(25, 13, 9, 0, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(26, 13, 6, 0, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(27, 14, 9, 0, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(28, 14, 6, 0, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(29, 15, 9, 0, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(30, 15, 6, 0, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(31, 16, 9, 0, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(32, 16, 6, 0, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(33, 17, 9, 0, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(34, 17, 6, 0, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(35, 18, 9, 0, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(36, 18, 6, 0, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(37, 19, 9, 0, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(38, 19, 6, 0, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(39, 20, 9, 0, '2026-01-04 17:10:46', '2026-01-04 17:10:46'),
+(40, 20, 6, 0, '2026-01-04 17:10:46', '2026-01-04 17:10:46'),
+(41, 21, 9, 0, '2026-01-04 17:10:46', '2026-01-04 17:10:46'),
+(42, 21, 6, 0, '2026-01-04 17:10:46', '2026-01-04 17:10:46');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_location`
+--
+
+CREATE TABLE `order_location` (
+  `id` int(11) NOT NULL,
+  `driver_location_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_state`
+--
+
+CREATE TABLE `order_state` (
+  `id` int(11) NOT NULL,
+  `state_id` int(11) DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_state`
+--
+
+INSERT INTO `order_state` (`id`, `state_id`, `order_id`, `created_at`, `updated_at`) VALUES
+(2, 1, 4, '2025-12-24 17:01:36', '2025-12-24 10:21:31'),
+(3, 4, 4, '2025-12-24 14:46:53', '2025-12-24 14:46:53'),
+(6, 1, 7, '2026-01-04 14:53:59', '2026-01-04 14:53:59'),
+(7, 1, 8, '2026-01-04 15:44:53', '2026-01-04 15:44:53'),
+(8, 1, 9, '2026-01-04 17:10:46', '2026-01-04 17:10:46');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_state_history`
+--
+
+CREATE TABLE `order_state_history` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `state_id` int(11) NOT NULL,
+  `changed_at` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_tracking`
+--
+
+CREATE TABLE `order_tracking` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `driver_id` int(11) NOT NULL,
+  `lat` decimal(9,6) NOT NULL,
+  `lang` decimal(9,6) NOT NULL,
+  `tracked_at` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `other_user`
+--
+
+CREATE TABLE `other_user` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `phone_number` varchar(50) NOT NULL,
+  `address` varchar(500) NOT NULL,
+  `user_name` varchar(200) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `otp_code`
+--
+
+CREATE TABLE `otp_code` (
+  `id` int(11) NOT NULL,
+  `code` varchar(6) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `otp_code`
+--
+
+INSERT INTO `otp_code` (`id`, `code`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, '995090', 5, '2025-12-22 00:04:54', '2025-12-22 00:04:54'),
+(3, '749448', 7, '2025-12-22 00:45:35', '2025-12-22 00:45:35'),
+(5, '560729', 9, '2026-01-02 00:47:18', '2026-01-02 00:47:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `otp_code_customer`
+--
+
+CREATE TABLE `otp_code_customer` (
+  `id` int(11) NOT NULL,
+  `code` varchar(6) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `otp_code_customer`
+--
+
+INSERT INTO `otp_code_customer` (`id`, `code`, `user_id`, `created_at`, `updated_at`) VALUES
+(2, '594031', 14, '2025-12-25 16:26:14', '2025-12-25 16:26:14'),
+(3, '243232', 9, '2026-01-02 13:35:51', '2026-01-02 13:35:51'),
+(4, '480590', 9, '2026-01-02 14:41:58', '2026-01-02 14:41:58'),
+(5, '419579', 9, '2026-01-03 13:10:31', '2026-01-03 13:10:31'),
+(6, '869985', 9, '2026-01-03 14:15:29', '2026-01-03 14:15:29'),
+(7, '538512', 9, '2026-01-03 17:30:31', '2026-01-03 17:30:31'),
+(8, '254286', 9, '2026-01-04 00:33:50', '2026-01-04 00:33:50'),
+(9, '484964', 9, '2026-01-04 01:31:14', '2026-01-04 01:31:14'),
+(10, '682667', 9, '2026-01-04 02:15:04', '2026-01-04 02:15:04'),
+(11, '772168', 9, '2026-01-04 14:48:43', '2026-01-04 14:48:43'),
+(12, '111461', 9, '2026-01-04 17:06:26', '2026-01-04 17:06:26'),
+(13, '496517', 9, '2026-01-04 18:10:54', '2026-01-04 18:10:54'),
+(14, '652221', 9, '2026-01-05 19:11:55', '2026-01-05 19:11:55'),
+(15, '997754', 9, '2026-01-05 19:21:50', '2026-01-05 19:21:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment`
+--
+
+CREATE TABLE `payment` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `amount` decimal(10,2) DEFAULT NULL,
+  `method_id` int(11) DEFAULT NULL,
+  `transaction_id` varchar(255) DEFAULT NULL,
+  `paid_at` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment_logs`
+--
+
+CREATE TABLE `payment_logs` (
+  `id` int(11) NOT NULL,
+  `payment_id` int(11) NOT NULL,
+  `status` varchar(255) NOT NULL,
+  `log_message` text DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `perant_category`
+--
+
+CREATE TABLE `perant_category` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `perant_category`
+--
+
+INSERT INTO `perant_category` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(2, 'مطاعم', '2025-12-12 20:08:45', '2025-12-12 20:08:45'),
+(3, 'سوبرماركت', '2025-12-12 20:09:13', '2025-12-12 20:09:13'),
+(4, 'هداية updated', '2025-12-12 22:10:47', '2025-12-12 20:10:47');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `permissions`
+--
+
+CREATE TABLE `permissions` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `permissions`
+--
+
+INSERT INTO `permissions` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(7, 'admins_management', '2025-12-10 15:15:42', '2025-12-10 15:15:42'),
+(8, 'roles_management', '2025-12-10 17:13:26', '2025-12-10 17:13:26'),
+(9, 'permission_management', '2025-12-10 23:33:38', '2025-12-10 23:33:38'),
+(10, 'role_permision_management', '2025-12-10 23:35:50', '2025-12-10 23:35:50'),
+(11, 'commercial_places_management', '2025-12-11 22:03:03', '2025-12-11 22:03:03'),
+(12, 'categories_management', '2025-12-11 22:03:11', '2025-12-11 22:03:11'),
+(13, 'products_management', '2025-12-11 22:03:21', '2025-12-11 22:03:21'),
+(14, 'modifiers_management', '2025-12-11 22:03:31', '2025-12-11 22:03:31'),
+(15, 'modifier_options_management', '2025-12-11 22:03:46', '2025-12-11 22:03:46'),
+(16, 'modifier_products_management', '2025-12-11 22:04:00', '2025-12-11 22:04:00'),
+(17, 'commercial_place_commissiont_management', '2025-12-18 01:51:33', '2025-12-18 01:51:33'),
+(18, 'commission_type_management', '2025-12-18 01:51:37', '2025-12-18 01:51:37'),
+(19, 'parent_categories_management', '2025-12-18 01:51:46', '2025-12-18 01:51:46'),
+(20, 'product_modifier_options_management', '2025-12-18 01:51:51', '2025-12-18 01:51:51'),
+(21, 'banners_management', '2025-12-18 01:55:36', '2025-12-18 01:55:36');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` text NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `abilities` text DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `phone_numbers`
+--
+
+CREATE TABLE `phone_numbers` (
+  `id` int(11) NOT NULL,
+  `commercial_place_id` int(11) NOT NULL,
+  `phoneNumber` varchar(50) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `phone_numbers`
+--
+
+INSERT INTO `phone_numbers` (`id`, `commercial_place_id`, `phoneNumber`, `created_at`, `updated_at`) VALUES
+(1, 10, '01281063411', '2025-12-11 12:16:46', '2025-12-11 12:16:46'),
+(2, 11, '01281063411', '2025-12-17 23:08:41', '2025-12-17 23:08:41'),
+(15, 1, '01281063411', '2026-01-05 15:26:16', '2026-01-05 15:26:16'),
+(16, 1, '01500102769', '2026-01-05 15:26:16', '2026-01-05 15:26:16');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product`
+--
+
+CREATE TABLE `product` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `commercial_place_id` int(11) NOT NULL,
+  `price` float DEFAULT NULL,
+  `note` text DEFAULT NULL,
+  `preparation_time` int(11) DEFAULT NULL,
+  `active` int(11) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product`
+--
+
+INSERT INTO `product` (`id`, `name`, `category_id`, `commercial_place_id`, `price`, `note`, `preparation_time`, `active`, `created_at`, `updated_at`) VALUES
+(9, 'product 9', 1, 1, 200, 'asdkjabshd', 20, 1, '2026-01-05 21:19:41', '2026-01-05 21:19:41'),
+(11, 'Burger', 2, 1, 110, 'lksadjaskdj', 120, 1, '2026-01-02 15:43:52', '2025-12-14 22:45:11');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_images`
+--
+
+CREATE TABLE `product_images` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `image_path` varchar(512) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_images`
+--
+
+INSERT INTO `product_images` (`id`, `product_id`, `image_path`, `created_at`, `updated_at`) VALUES
+(8, 11, 'products/eMbsCXMGG0CDSzGcQQQ6HvhZ6oj8TDJgU1JO1eY8.png', '2025-12-14 22:45:11', '2025-12-14 22:45:11');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_modifiers`
+--
+
+CREATE TABLE `product_modifiers` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `modifier_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_modifiers`
+--
+
+INSERT INTO `product_modifiers` (`id`, `product_id`, `modifier_id`, `created_at`, `updated_at`) VALUES
+(5, 11, 4, '2025-12-14 22:45:11', '2025-12-14 22:45:11'),
+(6, 11, 6, '2025-12-15 00:22:06', '2025-12-15 00:22:06');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_modifiers_options`
+--
+
+CREATE TABLE `product_modifiers_options` (
+  `id` int(11) NOT NULL,
+  `product_modifiers_id` int(11) NOT NULL,
+  `option_id` int(11) NOT NULL,
+  `price` double NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_modifiers_options`
+--
+
+INSERT INTO `product_modifiers_options` (`id`, `product_modifiers_id`, `option_id`, `price`, `created_at`, `updated_at`) VALUES
+(4, 5, 5, 30, '2025-12-14 22:45:11', '2025-12-14 22:45:11'),
+(5, 5, 6, 40, '2025-12-14 22:45:11', '2025-12-14 22:45:11'),
+(6, 5, 7, 60, '2025-12-14 22:45:11', '2025-12-14 22:45:11'),
+(7, 6, 12, 1, '2025-12-15 00:24:05', '2025-12-15 00:24:05'),
+(8, 6, 13, 1, '2025-12-15 00:24:11', '2025-12-15 00:24:11'),
+(9, 6, 14, 1, '2025-12-15 00:24:19', '2025-12-15 00:24:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_offer_list`
+--
+
+CREATE TABLE `product_offer_list` (
+  `id` int(11) NOT NULL,
+  `multi_offer_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `refunds`
+--
+
+CREATE TABLE `refunds` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `amount` float DEFAULT NULL,
+  `reason` text DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `status_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'Super Admin', 'Full access', '2025-12-10 19:28:35', '2025-12-10 17:28:35'),
+(2, 'Manager', 'Can manage content', '2025-12-09 19:59:02', '2025-12-09 17:52:18'),
+(3, 'Editor', 'Can edit posts', '2025-12-09 19:59:04', '2025-12-09 17:52:30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `role_permission`
+--
+
+CREATE TABLE `role_permission` (
+  `role_id` int(11) NOT NULL,
+  `permission_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `role_permission`
+--
+
+INSERT INTO `role_permission` (`role_id`, `permission_id`, `created_at`, `updated_at`) VALUES
+(1, 7, '2025-12-10 19:14:31', '2025-12-10 19:14:31'),
+(1, 8, '2025-12-10 19:14:56', '2025-12-10 19:14:56'),
+(1, 9, '2025-12-11 01:34:24', '2025-12-11 01:34:24'),
+(1, 10, '2025-12-11 01:36:09', '2025-12-11 01:36:09'),
+(1, 11, '2025-12-12 00:06:21', '2025-12-12 00:06:21'),
+(1, 12, '2025-12-12 00:06:21', '2025-12-12 00:06:21'),
+(1, 13, '2025-12-12 00:06:21', '2025-12-12 00:06:21'),
+(1, 14, '2025-12-12 00:06:21', '2025-12-12 00:06:21'),
+(1, 15, '2025-12-12 00:06:21', '2025-12-12 00:06:21'),
+(1, 16, '2025-12-12 00:06:21', '2025-12-12 00:06:21'),
+(1, 17, '2025-12-18 03:53:34', '2025-12-18 03:53:34'),
+(1, 18, '2025-12-18 03:53:34', '2025-12-18 03:53:34'),
+(1, 19, '2025-12-18 03:53:34', '2025-12-18 03:53:34'),
+(1, 20, '2025-12-18 03:53:34', '2025-12-18 03:53:34'),
+(1, 21, '2025-12-18 03:55:51', '2025-12-18 03:55:51'),
+(2, 7, '2025-12-26 02:55:05', '2025-12-26 02:55:05'),
+(2, 9, '2025-12-26 02:54:31', '2025-12-26 02:54:31'),
+(2, 10, '2025-12-26 02:54:31', '2025-12-26 02:54:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `safe`
+--
+
+CREATE TABLE `safe` (
+  `id` int(11) NOT NULL,
+  `safe_name` varchar(255) DEFAULT NULL,
+  `creditor_id` int(11) DEFAULT NULL,
+  `debtor_id` int(11) DEFAULT NULL,
+  `amount` decimal(10,2) DEFAULT NULL,
+  `creditor_agent_type_id` int(11) DEFAULT NULL,
+  `debtor_agent_type_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sessions`
+--
+
+CREATE TABLE `sessions` (
+  `id` varchar(255) NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `payload` longtext NOT NULL,
+  `last_activity` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('3MjJcFCmXwe7gdGdLMPVtkKQMbYJOlGcNI8P1966', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiTEtkSHpERWVYVENheDVIbHFFUFZJZUE4ZHdJdkJvM0NBQThtYU10UyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766686771),
+('5vdVnKn1KCkLSpMP01yRKZebjOMJDwzInP9PFwLD', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQmxmMTBzRHpKN09wU3hmbjBIaVd2elQ4TFJIUlRJR0g5SjBuampXSSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766686920),
+('dHeyLkZMoI0QfMOqU1f46YjyGnRYTLFDkOvsUUdn', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWk83M1NzMGk5bWlTWDJEV2RBZlVvWTBnaFU2bjUzRXlLdWVYcm8yVyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766686890),
+('ei8eRWTSwYhTk7UvAcBkjV54GeYT6l7oWeNVJb4u', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoic1ZtMVQwb29vMmtuVW9WMHpUTEJuWVc3NDBndzJ0MVNvUjJRYVBLSiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766687023),
+('G1UIPGbh9jzVOWBh62wAiKe6LxBkeOVkZOYu1QkT', NULL, '127.0.0.1', 'PostmanRuntime/7.49.1', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiZGI5TnY3T2hZb1NYd2tnR0ZQSEVUS2t5RmJJQWNhcXpJcHlNQzdkdCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1765308209),
+('lb1UawmwyEr6QzJiNRynEZluQJEplhaoCHAdBndY', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiU3NFaXBJbkhtQnBzWVZ1RERqWDhHU203ZHNqVFl5eTNWbnM4NktaNyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766686821),
+('LzF2QaR9g7z0FVUxdwBOH910mrDvnFnbmz5YP314', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiZFJ6czJlUXVpTkxPbnZiSXpOZ1pYTU1EaGprSWdXRFZhSndINWp3WCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766687102),
+('MD9q8awW2qVpBHd6OBq7Nke6TszH1CDMLfD46FLf', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoid2V5NnpPaFRybG04QWVLb2Y2N0NEZlNMempDd3VVVGtoWGkwUHNScyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766686805),
+('ophOVZySa5nxceY8fUxKIsbOxjl9NoYEi3Cg1eEU', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQ3drMEtHS1p2M0hoeThhOWgxSTRrNUxMcWFHdERySUp6TmhCZ1hxRiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766686842),
+('pFD3ssTHEV1cau4GTz53fOiQx5j8zzRmUqGCORm4', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWmVyZlFpZjBkNVI5RmtYdVNGQWlIbXNmT05scGRVV2FRWEUyS2FVTSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766686835),
+('qlA5FSKSUZRi838ifQHJ1sXB1Rmj4vAKYEQ8nmVg', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNUlEc3pHSkk4YmtLTkF2b1Y1d3V3bGxsaDhHRzdVdndTMWVlMkVKNiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766687185),
+('qo2TsnlU41MCkBP9c4ufqVCq0ZWVPcAXs5V45y8j', NULL, '127.0.0.1', 'PostmanRuntime/7.49.1', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoic09xcDFMWDE5a0p6Skw0aUZNNjBybHE4VG4yNVdyWkxDZDFuVXBiciI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1765394082),
+('RJAmMqb3QVXHr3YwUpeNse01JNmX0sX4xsdy3ZVZ', NULL, '127.0.0.1', 'PostmanRuntime/7.51.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoieFhPWlFpc2VVNjE0eE5kRFhyTmxyQ2pvUGNmcFl0aWhxbk1YdEVTTiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1767359698),
+('RRwD3ve7QpxY0BECTIVptojIpQFUqsa3io1GV5b0', 1, '127.0.0.1', 'PostmanRuntime/7.49.1', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiSHFydmx1dDRLMmZPM3pRRXdrTktvV3BEbWlNVVc5TGVDWFFFVWNCZiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1765758788),
+('scPg7fKUsk5SR1q9IbAZ7pC202u5RMP2k0GpnoyE', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiTmRVVkxwc1MzU2xYQWc3RThsWVRoN1R4enhza1RaVGVwSTUxVVFJRSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1766686958),
+('TegtGHXaa929u7LqoPlXFqNyFy9hF52l4fEePpIR', 1, '127.0.0.1', 'PostmanRuntime/7.49.1', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiS0o3bklFVkFRM0FHSG1WeDdRM2V3bXpZbFk3WU1IMVh0THNMckhNMSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1765743302);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `single_offer`
+--
+
+CREATE TABLE `single_offer` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `commercial_place_id` int(11) DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 0,
+  `price` float NOT NULL,
+  `expiration_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `single_offer`
+--
+
+INSERT INTO `single_offer` (`id`, `product_id`, `commercial_place_id`, `active`, `price`, `expiration_date`, `created_at`, `updated_at`) VALUES
+(1, 11, 2, 1, 99.5, '2026-05-02 12:36:23', '2026-01-05 21:45:33', '2026-01-02 11:35:09'),
+(2, 9, 2, 1, 99.5, '2026-05-02 12:36:23', '2026-01-05 21:45:30', '2026-01-02 11:35:17'),
+(3, 9, 1, 1, 99.5, '2026-05-02 12:36:23', '2026-01-05 21:45:27', '2026-01-02 11:35:32'),
+(4, 11, 1, 1, 99.5, '2026-05-02 12:36:23', '2026-01-05 21:45:23', '2026-01-02 11:35:39');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `state`
+--
+
+CREATE TABLE `state` (
+  `id` int(11) NOT NULL,
+  `state_name_en` varchar(255) DEFAULT NULL,
+  `state_name_ar` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `state`
+--
+
+INSERT INTO `state` (`id`, `state_name_en`, `state_name_ar`, `created_at`, `updated_at`) VALUES
+(1, 'Pending', 'في الانتظار', '2025-12-23 01:57:47', '2025-12-23 01:57:47'),
+(2, 'Confirmed', 'تمت الموافقة', '2025-12-23 01:57:47', '2025-12-23 01:57:47'),
+(3, 'Rejected', 'تم الرفض', '2025-12-23 01:57:47', '2025-12-23 01:57:47'),
+(4, 'Cancelled', 'تم الإلغاء', '2025-12-23 01:57:47', '2025-12-23 01:57:47'),
+(5, 'Preparing', 'يتم التجهيز', '2025-12-23 01:57:47', '2025-12-23 01:57:47'),
+(6, 'Ready', 'جاهز للإرسال', '2025-12-23 01:57:47', '2025-12-23 01:57:47'),
+(7, 'Assigned', 'يتم التسليم', '2025-12-23 01:57:47', '2025-12-23 01:57:47'),
+(8, 'On The Way', 'في الطريق', '2025-12-23 01:57:47', '2025-12-23 01:57:47'),
+(9, 'Delivered', 'وصل', '2025-12-23 01:57:47', '2025-12-23 01:57:47');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `image_path` varchar(512) DEFAULT NULL,
+  `lang` float DEFAULT NULL,
+  `lat` float DEFAULT NULL,
+  `send_notification` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `remember_token` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_roles`
+--
+
+CREATE TABLE `users_roles` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_coupon`
+--
+
+CREATE TABLE `user_coupon` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `coupon_id` int(11) NOT NULL,
+  `is_used` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `verifcations`
+--
+
+CREATE TABLE `verifcations` (
+  `id` int(11) NOT NULL,
+  `is_verified` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `verifcations`
+--
+
+INSERT INTO `verifcations` (`id`, `is_verified`, `created_at`, `updated_at`) VALUES
+(1, 1, '2025-12-22 02:47:06', '2025-12-22 00:47:06'),
+(2, 1, '2025-12-24 18:02:45', '2025-12-24 16:02:45'),
+(3, 0, '2025-12-25 16:26:14', '2025-12-25 16:26:14'),
+(4, 0, '2026-01-02 00:47:18', '2026-01-02 00:47:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `waiting_status`
+--
+
+CREATE TABLE `waiting_status` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wallet`
+--
+
+CREATE TABLE `wallet` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `balance` double NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `wallet`
+--
+
+INSERT INTO `wallet` (`id`, `user_id`, `balance`, `created_at`, `updated_at`) VALUES
+(1, 13, 0, '2025-12-24 16:01:16', '2025-12-24 16:01:16'),
+(2, 14, 0, '2025-12-25 16:26:14', '2025-12-25 16:26:14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `zone`
+--
+
+CREATE TABLE `zone` (
+  `id` int(11) NOT NULL,
+  `ar_name` varchar(500) NOT NULL,
+  `en_name` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `zone`
+--
+
+INSERT INTO `zone` (`id`, `ar_name`, `en_name`, `created_at`, `updated_at`) VALUES
+(1, 'جنين', 'Jenin', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(2, 'طوباس والأغوار الشمالية', 'Tubas and the Northern Valleys', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(3, 'طولكرم', 'Tulkarm', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(4, 'نابلس', 'Nablus', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(5, 'قلقيلية', 'Qalqilya', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(6, 'سلفيت', 'Salfit', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(7, 'رام الله والبيرة', 'Ramallah and Al-Bireh', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(8, 'أريحا والأغوار', 'Jericho and the Jordan Valley', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(9, 'بيت لحم', 'Bethlehem', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(10, 'الخليل', 'Hebron', '2026-01-04 21:57:02', '2026-01-04 21:57:02'),
+(11, 'القدس', 'Jerusalem', '2026-01-04 21:57:02', '2026-01-04 21:57:02');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `address`
+--
+ALTER TABLE `address`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `customer_id_fk` (`customer_id`);
+
+--
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`) USING HASH,
+  ADD KEY `admin_role_fk` (`role_id`);
+
+--
+-- Indexes for table `appointments`
+--
+ALTER TABLE `appointments`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `banners`
+--
+ALTER TABLE `banners`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `cache`
+--
+ALTER TABLE `cache`
+  ADD PRIMARY KEY (`key`);
+
+--
+-- Indexes for table `cache_locks`
+--
+ALTER TABLE `cache_locks`
+  ADD PRIMARY KEY (`key`);
+
+--
+-- Indexes for table `campaigns`
+--
+ALTER TABLE `campaigns`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `card_payment`
+--
+ALTER TABLE `card_payment`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `carts`
+--
+ALTER TABLE `carts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_cart_fk` (`customer_id`);
+
+--
+-- Indexes for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `cart_cart_item_fk` (`cart_id`),
+  ADD KEY `product_cart_item_fk` (`product_id`);
+
+--
+-- Indexes for table `cart_item_options`
+--
+ALTER TABLE `cart_item_options`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `CIO_cart_item_FK` (`cart_item_id`),
+  ADD KEY `CIO_MO_FK` (`modifier_option_id`);
+
+--
+-- Indexes for table `category`
+--
+ALTER TABLE `category`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `PC_C_FK` (`parent_category_id`);
+
+--
+-- Indexes for table `commercial_category`
+--
+ALTER TABLE `commercial_category`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `commercial_place`
+--
+ALTER TABLE `commercial_place`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `commercial_place_commission`
+--
+ALTER TABLE `commercial_place_commission`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `CT_CPC_FK` (`commission_id`),
+  ADD KEY `CP_CPC_FK` (`commercial_place_id`);
+
+--
+-- Indexes for table `commercial_place_images`
+--
+ALTER TABLE `commercial_place_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `CPI_CP_FK` (`commercial_place_id`);
+
+--
+-- Indexes for table `commercial_place_profile_images`
+--
+ALTER TABLE `commercial_place_profile_images`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `commission_type`
+--
+ALTER TABLE `commission_type`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `coupons`
+--
+ALTER TABLE `coupons`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
+-- Indexes for table `coupon_usages`
+--
+ALTER TABLE `coupon_usages`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `customer`
+--
+ALTER TABLE `customer`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `discount_type`
+--
+ALTER TABLE `discount_type`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `driver`
+--
+ALTER TABLE `driver`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `phone_number` (`phone_number`);
+
+--
+-- Indexes for table `driver_safe`
+--
+ALTER TABLE `driver_safe`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `evaluation`
+--
+ALTER TABLE `evaluation`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `failed_jobs`
+--
+ALTER TABLE `failed_jobs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `favorite_places`
+--
+ALTER TABLE `favorite_places`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `favorite_products`
+--
+ALTER TABLE `favorite_products`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `jobs`
+--
+ALTER TABLE `jobs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `jobs_queue_index` (`queue`);
+
+--
+-- Indexes for table `job_batches`
+--
+ALTER TABLE `job_batches`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `location`
+--
+ALTER TABLE `location`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `CP_L_FK` (`commercial_place_id`),
+  ADD KEY `idx_location_lat_lang` (`lat`,`lang`);
+
+--
+-- Indexes for table `loyalty_points`
+--
+ALTER TABLE `loyalty_points`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `merchant`
+--
+ALTER TABLE `merchant`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `ME_CO_ID_FK` (`commercial_place_id`);
+
+--
+-- Indexes for table `method`
+--
+ALTER TABLE `method`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `modifiers`
+--
+ALTER TABLE `modifiers`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `modifier_options`
+--
+ALTER TABLE `modifier_options`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `M_O_FK` (`modifier_id`);
+
+--
+-- Indexes for table `multi_offer`
+--
+ALTER TABLE `multi_offer`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `offer_product`
+--
+ALTER TABLE `offer_product`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order`
+--
+ALTER TABLE `order`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order_address`
+--
+ALTER TABLE `order_address`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order_item_options`
+--
+ALTER TABLE `order_item_options`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order_location`
+--
+ALTER TABLE `order_location`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order_state`
+--
+ALTER TABLE `order_state`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order_state_history`
+--
+ALTER TABLE `order_state_history`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order_tracking`
+--
+ALTER TABLE `order_tracking`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `other_user`
+--
+ALTER TABLE `other_user`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `otp_code`
+--
+ALTER TABLE `otp_code`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `otp_code_customer`
+--
+ALTER TABLE `otp_code_customer`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `password_reset_tokens`
+--
+ALTER TABLE `password_reset_tokens`
+  ADD PRIMARY KEY (`email`);
+
+--
+-- Indexes for table `payment`
+--
+ALTER TABLE `payment`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `payment_logs`
+--
+ALTER TABLE `payment_logs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `perant_category`
+--
+ALTER TABLE `perant_category`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `permissions`
+--
+ALTER TABLE `permissions`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
+  ADD KEY `personal_access_tokens_expires_at_index` (`expires_at`);
+
+--
+-- Indexes for table `phone_numbers`
+--
+ALTER TABLE `phone_numbers`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `PN_CP_FK` (`commercial_place_id`);
+
+--
+-- Indexes for table `product`
+--
+ALTER TABLE `product`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `P_CAT_FK` (`category_id`),
+  ADD KEY `P_CP_FK` (`commercial_place_id`);
+
+--
+-- Indexes for table `product_images`
+--
+ALTER TABLE `product_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `PI_PID_FK` (`product_id`);
+
+--
+-- Indexes for table `product_modifiers`
+--
+ALTER TABLE `product_modifiers`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `PM_M_FK` (`modifier_id`),
+  ADD KEY `PM_P_FK` (`product_id`);
+
+--
+-- Indexes for table `product_modifiers_options`
+--
+ALTER TABLE `product_modifiers_options`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `PMO_MO_FK` (`option_id`),
+  ADD KEY `PM_PMO_FK` (`product_modifiers_id`);
+
+--
+-- Indexes for table `product_offer_list`
+--
+ALTER TABLE `product_offer_list`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `refunds`
+--
+ALTER TABLE `refunds`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `role_permission`
+--
+ALTER TABLE `role_permission`
+  ADD PRIMARY KEY (`role_id`,`permission_id`),
+  ADD UNIQUE KEY `unique_role_permission` (`role_id`,`permission_id`),
+  ADD KEY `permission_id` (`permission_id`);
+
+--
+-- Indexes for table `safe`
+--
+ALTER TABLE `safe`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `sessions`
+--
+ALTER TABLE `sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sessions_user_id_index` (`user_id`),
+  ADD KEY `sessions_last_activity_index` (`last_activity`);
+
+--
+-- Indexes for table `single_offer`
+--
+ALTER TABLE `single_offer`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `state`
+--
+ALTER TABLE `state`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
+-- Indexes for table `users_roles`
+--
+ALTER TABLE `users_roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_role` (`user_id`,`role_id`);
+
+--
+-- Indexes for table `user_coupon`
+--
+ALTER TABLE `user_coupon`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_coupon` (`user_id`,`coupon_id`);
+
+--
+-- Indexes for table `verifcations`
+--
+ALTER TABLE `verifcations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `waiting_status`
+--
+ALTER TABLE `waiting_status`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `wallet`
+--
+ALTER TABLE `wallet`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `zone`
+--
+ALTER TABLE `zone`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `address`
+--
+ALTER TABLE `address`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT for table `appointments`
+--
+ALTER TABLE `appointments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `banners`
+--
+ALTER TABLE `banners`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `campaigns`
+--
+ALTER TABLE `campaigns`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `card_payment`
+--
+ALTER TABLE `card_payment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `carts`
+--
+ALTER TABLE `carts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `cart_item_options`
+--
+ALTER TABLE `cart_item_options`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT for table `category`
+--
+ALTER TABLE `category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `commercial_category`
+--
+ALTER TABLE `commercial_category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `commercial_place`
+--
+ALTER TABLE `commercial_place`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `commercial_place_commission`
+--
+ALTER TABLE `commercial_place_commission`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `commercial_place_images`
+--
+ALTER TABLE `commercial_place_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT for table `commercial_place_profile_images`
+--
+ALTER TABLE `commercial_place_profile_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `commission_type`
+--
+ALTER TABLE `commission_type`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `coupons`
+--
+ALTER TABLE `coupons`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `coupon_usages`
+--
+ALTER TABLE `coupon_usages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `customer`
+--
+ALTER TABLE `customer`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `discount_type`
+--
+ALTER TABLE `discount_type`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `driver`
+--
+ALTER TABLE `driver`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `driver_safe`
+--
+ALTER TABLE `driver_safe`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `evaluation`
+--
+ALTER TABLE `evaluation`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `failed_jobs`
+--
+ALTER TABLE `failed_jobs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `favorite_places`
+--
+ALTER TABLE `favorite_places`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `favorite_products`
+--
+ALTER TABLE `favorite_products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jobs`
+--
+ALTER TABLE `jobs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `location`
+--
+ALTER TABLE `location`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
+--
+-- AUTO_INCREMENT for table `loyalty_points`
+--
+ALTER TABLE `loyalty_points`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `merchant`
+--
+ALTER TABLE `merchant`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `method`
+--
+ALTER TABLE `method`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `modifiers`
+--
+ALTER TABLE `modifiers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `modifier_options`
+--
+ALTER TABLE `modifier_options`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `multi_offer`
+--
+ALTER TABLE `multi_offer`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `offer_product`
+--
+ALTER TABLE `offer_product`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `order`
+--
+ALTER TABLE `order`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `order_address`
+--
+ALTER TABLE `order_address`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `order_item_options`
+--
+ALTER TABLE `order_item_options`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+
+--
+-- AUTO_INCREMENT for table `order_state`
+--
+ALTER TABLE `order_state`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `order_state_history`
+--
+ALTER TABLE `order_state_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `order_tracking`
+--
+ALTER TABLE `order_tracking`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `other_user`
+--
+ALTER TABLE `other_user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `otp_code`
+--
+ALTER TABLE `otp_code`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `otp_code_customer`
+--
+ALTER TABLE `otp_code_customer`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `payment_logs`
+--
+ALTER TABLE `payment_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `perant_category`
+--
+ALTER TABLE `perant_category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `permissions`
+--
+ALTER TABLE `permissions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `phone_numbers`
+--
+ALTER TABLE `phone_numbers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `product`
+--
+ALTER TABLE `product`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `product_images`
+--
+ALTER TABLE `product_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `product_modifiers`
+--
+ALTER TABLE `product_modifiers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `product_modifiers_options`
+--
+ALTER TABLE `product_modifiers_options`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `single_offer`
+--
+ALTER TABLE `single_offer`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `state`
+--
+ALTER TABLE `state`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users_roles`
+--
+ALTER TABLE `users_roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user_coupon`
+--
+ALTER TABLE `user_coupon`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `verifcations`
+--
+ALTER TABLE `verifcations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `wallet`
+--
+ALTER TABLE `wallet`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `zone`
+--
+ALTER TABLE `zone`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
