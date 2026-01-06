@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ImagesServices {
-    public function uploadImage(string $categoryName , $image) {
+    static public function uploadImage(string $categoryName , $image) {
         $fileName = Str::random(10) . '_' . time() . '.' . $image->getClientOriginalExtension();
-        $path = Storage::url($image->storeAs('products', $categoryName, 'public'));
+        $path = Storage::url($image->storeAs($categoryName , $fileName , 'public'));
         return $path ;
     }
 }

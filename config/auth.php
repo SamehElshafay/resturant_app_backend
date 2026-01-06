@@ -49,18 +49,18 @@ return [
         'admins' => [
             'provider' => 'admins',
             'table' => 'password_reset_tokens',
-            'expire' => 100000,
-            'throttle' => 100000,
+            'expire' => 60,
+            'throttle' => 60,
         ],
 
         'customers' => [
             'provider' => 'customers',
             'table' => 'password_reset_tokens',
-            'expire' => 100000,
-            'throttle' => 100000,
+            'expire' => 60,
+            'throttle' => 60,
         ],
     ],
 
-    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 108000),
+    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
 ];

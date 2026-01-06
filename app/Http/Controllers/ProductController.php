@@ -78,7 +78,7 @@ class ProductController extends Controller
             'note'                => 'required|nullable|string',
             'preparation_time'    => 'required|integer',
             'images'              => 'required|array',
-            'images.*'            => 'file|mimes:jpg,jpeg,png,webp|max:2048',
+            'images.*'            => 'image|mimes:jpg,jpeg,png,webp|max:2048',
             'modifiers'                       => 'sometimes|array',
             'modifiers.*.modifier_id'         => 'required|integer|exists:modifiers,id',
             'modifiers.*.options'             => 'required|array',
@@ -93,6 +93,7 @@ class ProductController extends Controller
                 foreach ($request->file('images') as $img) {
                     $path = ImagesServices::uploadImage('products' , $img ) ;
                     //$path = $img->store('products', 'public');
+                    echo $path ;
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $path
