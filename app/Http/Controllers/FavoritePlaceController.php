@@ -54,7 +54,8 @@ class FavoritePlaceController extends Controller
 
     public function destroy($id) {
         return $this->transactionResponse(function () use ($id) {
-            $favorite = FavoritePlace::findOrFail($id);
+            $user = auth('customer')->user();
+            $favorite = FavoritePlace::where('customer_id', $user->id)->where('commercial_place_id', $id)->get()->first() ;
             $favorite->delete();
             return true;
         });

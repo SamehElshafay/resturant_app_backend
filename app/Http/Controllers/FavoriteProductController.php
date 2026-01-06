@@ -52,10 +52,9 @@ class FavoriteProductController extends Controller {
 
     public function destroy($id) {
         return $this->transactionResponse(function () use ($id) {
-
-            $favorite = FavoriteProduct::findOrFail($id);
+            $user = auth('customer')->user();
+            $favorite = FavoriteProduct::where('customer_id', $user->id)->where('product_id', $id)->get()->first();
             $favorite->delete();
-
             return true;
         });
     }
