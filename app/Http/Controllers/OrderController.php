@@ -108,7 +108,6 @@ class OrderController extends Controller {
         });
     }
 
-
     public function getOrderOfUser(Request $request) {
         return $this->transactionResponseWithoutReturn(function () use ($request) {
             $validator = validator($request->all(), [
@@ -122,6 +121,25 @@ class OrderController extends Controller {
             return [
                 'success' => true,
                 'orders' => $order,
+            ];
+        });
+    }
+
+
+    public function getOrdersOfMerchant(Request $request) {
+        return $this->transactionResponseWithoutReturn(function () use ($request) {
+            $merchant = auth('merchant')->user();
+
+            $validator = validator($request->all(), [
+                'state' => 'required|integer|exists:merchant,id',
+            ]);
+            
+
+            $orders = Order::where('commercial_place_id', $merchant->commercial_place_id)->latest()->paginate(10);
+
+            return [
+                'success' => true,
+                'orders' => $orders,
             ];
         });
     }

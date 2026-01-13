@@ -307,7 +307,10 @@ Route::prefix('commercial-place')->group(function () {
         Route::delete('/{id}', [ProductController::class, 'destroy'])->middleware(CheckVerification::class)->middleware(CheckCommercialPlace::class);
     });
 
-    
+    Route::prefix('orders')->group(function () {
+        Route::get('/get_orders', [OrderController::class, 'getOrdersOfMerchant'])->middleware(CheckVerification::class)->middleware(CheckCommercialPlace::class);
+    });
+
     /*Route::prefix('customer_management')->group(function () {
         Route::get('/getUserProfile', [CustomerController::class, 'getUserProfile']);
         Route::post('/update', [CustomerController::class, 'updateCustomerProfile']);

@@ -5,25 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\MerchantModels\Merchant;
 use App\Models\MerchantModels\OtpCode;
 use App\Models\MerchantModels\Verifcation;
+use App\Traits\TransactionResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class MerchantController extends Controller{
+    
+    use TransactionResponse;
+    
     public function register(Request $request){
-        try {
+        return $this->transactionResponseWithoutReturn(function () use ($request){
             $validated = $request->validate([
                 'name' => 'required|string|max:100',
                 'phoneNumber' => 'required|string|max:20|unique:merchant',
                 'commercial_place_id' => 'nullable|integer|exists:commercial_places,id',
-                'password' => 'required|string|min:6',
+                //'password' => 'required|string|min:6',
             ]);
+
+            $validated['password'] = 12345678 ;
 
             $validated['password'] = bcrypt($validated['password']);
 
             $merchant = Merchant::create($validated);
             
-            OtpCode::create([
+            $otpCode = OtpCode::create([
                 'code' => rand(100000, 999999),
                 'user_id' => $merchant->id,
             ]);
@@ -43,46 +49,34 @@ class MerchantController extends Controller{
             return response()->json([
                 'success' => true,
                 'data' => $merchant,
-                'token' => $token,
-                'message' => 'Merchant created successfully'
+                //'token' => $token,
+                'message' => 'Merchant created successfully',
+                'otpCode' => $otpCode->code,
             ], 201);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-            ], 422);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong' . $e->getMessage(),
-            ], 500);
-        }
+        });
     }
 
     public function verifiyOtpCode(Request $request) {
-        try {
+        return $this->transactionResponse(function () use ($request){
             $validated = $request->validate([
+                'phone_number' => 'required|string',
                 'otp_code' => 'required|string|max:6',
             ]);
 
-            $merchant = auth('merchant')->user();
+            $merchant = Merchant::where('phoneNumber' , $request->phone_number)->get()->first() ;
 
             if (!$merchant) {
-                return response()->json([
-                    'success' => false,
+                throw ValidationException::withMessages([
                     'message' => 'Merchant not found'
-                ], 404);
+                ]);
             }
 
-            $otpCode = OtpCode::where('user_id', $merchant->id)->where('user_type', 1)->where('code', $validated['otp_code']);
+            $otpCode = OtpCode::where('user_id', $merchant->id)->where('code', $validated['otp_code'])->get()->first();
 
             if (!$otpCode) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid OTP code'
-                ], 400);
+                throw ValidationException::withMessages([
+                    'otp_code' => 'Invalid OTP code'
+                ]);
             }
 
             $otpCode->delete();
@@ -90,26 +84,27 @@ class MerchantController extends Controller{
             $verifcation->is_verified = true;
             $verifcation->save();
 
+            $token = auth()->guard('merchant')->attempt([
+                'phoneNumber' => $validated['phone_number'],
+                'password' => '12345678',
+            ]);
+
             return response()->json([
                 'success' => true,
-                'message' => 'OTP code sent successfully to ' ,
+                'message' => 'OTP code sent successfully' ,
+                'token' => $token
             ], 200);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-            ], 422);
-        }
+        });
     }
 
     public function login(Request $request) {
-        try {
+        return $this->transactionResponseWithoutReturn(function () use ($request){
             $validated = $request->validate([
                 'phoneNumber' => 'required|string',
-                'password' => 'required|string|min:6',
+                'password' => 'sometimes|string',
             ]);
 
+            $validated['password'] = 12345678 ;
             if (!$token = auth()->guard('merchant')->attempt($validated)) {
                 return response()->json([
                     'success' => false,
@@ -119,22 +114,19 @@ class MerchantController extends Controller{
 
             $merchant = auth('merchant')->user();
 
+            /*$otpCode = OtpCode::create([
+                'code' => rand(100000, 999999),
+                'user_id' => $merchant->id,
+            ]);*/
+
             return response()->json([
                 'success' => true,
                 'message' => 'Login successful',
-                'data' => [
-                    'merchant' => $merchant,
-                    'token' => $token,
-                    'token_type' => 'bearer',
-                ],
+                'merchant' => $merchant,
+                'token' => $token,
+                //'otpCode' => $otpCode->code,
             ], 200);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-            ], 422);
-        }
+        });
     }
 
     public function logout(Request $request) {
@@ -223,7 +215,7 @@ class MerchantController extends Controller{
     }
 
     public function update(Request $request){
-        try {
+        return $this->transactionResponseWithoutReturn(function () use ($request){
             $validated = $request->validate([
                 'name' => 'sometimes|required|string',
                 'commercial_place_id' => 'sometimes|nullable|integer|exists:commercial_place,id',
@@ -237,10 +229,9 @@ class MerchantController extends Controller{
             $merchant = Merchant::findOrFail($request->id);
 
             if (!$merchant) {
-                return response()->json([
-                    'success' => false,
+                Throw ValidationException::withMessages([
                     'message' => 'Merchant not found'
-                ], 404);
+                ]);
             }
 
             $merchant->update($validated);
@@ -249,27 +240,21 @@ class MerchantController extends Controller{
                 'message' => 'Merchant updated successfully',
                 'merchant' => $merchant
             ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Update failed: ' . $e->getMessage(),
-            ], 400);
-        }
+        });
     }
 
     public function destroy($id){
         try {
-            $admin = Merchant::find($id);
+            $merchant = Merchant::find($id);
 
-            if (!$admin) {
+            if (!$merchant) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Admin not found'
                 ], 404);
             }
 
-            $admin->delete();
+            $merchant->delete();
 
             return response()->json([
                 'success' => true,
