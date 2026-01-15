@@ -22,7 +22,8 @@ class Merchant extends Authenticatable implements JWTSubject {
 
     protected $with = [
         'commercialPlace',
-        'verifcation'
+        'verifcation',
+        'merchant_image'
     ];
 
     protected $hidden = [
@@ -41,6 +42,10 @@ class Merchant extends Authenticatable implements JWTSubject {
 
     public function commercialPlace(){
         return $this->belongsTo(CommercialPlace::class , 'commercial_place_id' );
+    }
+
+    public function merchant_image(){
+        return $this->hasOne(MerchantImage::class, 'merchant_id');
     }
 
     public function verifcation(){

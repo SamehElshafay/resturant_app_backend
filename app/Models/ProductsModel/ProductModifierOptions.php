@@ -17,6 +17,7 @@ class ProductModifierOptions extends Model
         'product_modifiers_id',
         'option_id',
         'price',
+        'active',
         'created_at',
         'updated_at',
     ];

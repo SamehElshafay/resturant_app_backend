@@ -14,12 +14,14 @@ class ProductModifier extends Model
     protected $fillable = [
         'product_id',
         'modifier_id',
+        'active',
         'created_at',
         'updated_at',
     ];
 
     protected $casts = [
         'product_id' => 'integer',
+        'active' => 'integer',
         'modifier_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

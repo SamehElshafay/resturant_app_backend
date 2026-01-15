@@ -14,8 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class ProductController extends Controller
-{
+class ProductController extends Controller {
     public function index(Request $request) {
         try {
             $request->validate([
@@ -153,7 +152,7 @@ class ProductController extends Controller
 
                 'deleted_images'   => 'sometimes|array',
                 'deleted_images.*' => 'integer|exists:product_images,id',
-                'active' => 'sometimes|boolean',
+                'active'           => 'sometimes|boolean',
             ]);
 
             $product->update(collect($validated)->except(['images', 'deleted_images'])->toArray());
@@ -276,15 +275,26 @@ class ProductController extends Controller
         }
     }
 
-    public function getProductsOfMerchant(){
+    public function getProductsOfMerchant(Request $request){
         try{
+            $validated = $request->validate([
+                'state' => 'required|string|in:all,active,inactive',
+            ]);
+
             $merchant = auth('merchant')->user();
             
-            $categories = Category::whereHas('products', function ($q) use ($merchant) {
+            $categories = Category::whereHas('products', function ($q) use ($merchant, $validated) {
                 $q->where('commercial_place_id', $merchant->commercial_place_id);
-            })->with(['products' => function ($q) use ($merchant) {
+                if ($validated['state'] !== 'all') {
+                    $q->where('active', $validated['state'] === 'active' ? 1 : 0);
+                }
+            })->with(['products' => function ($q) use ($merchant, $validated) {
                 $q->where('commercial_place_id', $merchant->commercial_place_id);
-            }])->get();
+                if ($validated['state'] !== 'all') {
+                    $q->where('active', $validated['state'] === 'active' ? 1 : 0);
+                }
+            }])
+            ->get();
             
             return response()->json([
                 'success' => true,
@@ -294,6 +304,147 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function productVisibility(Request $request){
+        DB::beginTransaction();
+
+        try {
+            $validated = $request->validate([
+                'product_id' => 'required|integer|exists:product,id',
+            ]);
+            
+            $product = Product::findOrFail($validated['product_id']);
+            
+            if(!$product){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product not found',
+                ], 500);
+            }
+
+            $active = $product->active ;
+            if($product->active == 1){
+                $active = 0 ;
+            }else{
+                $active = 1 ;
+            }
+            
+            $product->update([
+                'active' => $active,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message'    => 'Product ' . ($active ? 'activated' : 'hidden') . ' successfully',
+                'data' => $product,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function modifierVisibility(Request $request){
+        DB::beginTransaction();
+        try {
+            $validated = $request->validate([
+                'product_id' => 'required|integer|exists:product,id',
+                'modifier_id' => 'required|integer|exists:modifiers,id',
+            ]);
+
+            $productModifier = ProductModifier::where('product_id', $validated['product_id'])
+                ->where('modifier_id', $validated['modifier_id'])->get()->first();
+            
+                if(!$productModifier){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Modifier not found for this product',
+                ], 500);
+            }
+
+            $active = $productModifier->active ;
+
+            if($productModifier->active == 0){
+                $active = 1 ;
+            }else{
+                $active = 0 ;
+            }
+
+            $productModifier->update(['active' => $active]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message'    => 'Modifier ' . ($active ? 'activated' : 'hidden') . ' successfully',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function optionVisibility(Request $request){
+        DB::beginTransaction();
+        try {
+            $validated = $request->validate([
+                'product_id' => 'required|integer|exists:product,id',
+                'modifier_id' => 'required|integer|exists:modifiers,id',
+                'option_id' => 'required|integer|exists:modifier_options,id',
+            ]);
+
+            $productModifier = ProductModifier::where('product_id', $validated['product_id'])
+                ->where('modifier_id', $validated['modifier_id'])
+                ->update(['active' => 0]);
+
+            $productModifierOptions = ProductModifierOptions::where('product_modifiers_id', $productModifier->id)
+                ->where('option_id', $validated['option_id'])->get()->first();
+
+                if(!$productModifierOptions){
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Option not found for this modifier',
+                    ], 500);
+                }
+
+
+            $active = $productModifierOptions->active ;
+            if($productModifierOptions->active == 0){
+                $active = 1 ;
+            }else{
+                $active = 0 ;
+            }
+
+            $productModifierOptions->update(['active' => $active]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message'    => 'Option ' . ($active ? 'activated' : 'hidden') . ' successfully',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

@@ -18,7 +18,7 @@ class SingleOffer extends Model
         'commercial_place_id',
         'active',
         'price',
-        'expiration_date',
+        'expire_date',
         'created_at',
         'updated_at',
     ];

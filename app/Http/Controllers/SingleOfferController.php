@@ -36,7 +36,7 @@ class SingleOfferController extends Controller
                 'product_id' => 'required|exists:product,id',
                 'commercial_place_id' => 'required|exists:commercial_place,id',
                 'price' => 'required|numeric|min:0',
-                'expiration_date' => 'required|date|after:today',
+                'expire_date' => 'required|date|after:today',
             ]);
 
             $exists = SingleOffer::where('product_id', $data['product_id'])
@@ -52,16 +52,18 @@ class SingleOfferController extends Controller
         });
     }
 
-    public function update(Request $request, $id){
-        return $this->transactionResponse(function () use ($request, $id) {
+    public function update(Request $request){
+        return $this->transactionResponse(function () use ($request) {
 
-            $offer = SingleOffer::findOrFail($id);
 
             $data = $request->validate([
+                'id'                   => 'sometimes|exists:offer,id',
                 'price'                => 'sometimes|numeric|min:0',
-                'expiration_date'      => 'sometimes|date|after:today',
-                'active'              => 'sometimes|boolean',
+                'expire_date'          => 'sometimes|date|after:today',
+                'active'               => 'sometimes|boolean',
             ]);
+
+            $offer = SingleOffer::findOrFail($request->id);
 
             $offer->update($data);
 

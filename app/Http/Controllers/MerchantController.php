@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CommercialPlaceModels\Appointment;
+use App\Models\CommercialPlaceModels\PhoneNumbers;
 use App\Models\MerchantModels\Merchant;
+use App\Models\MerchantModels\MerchantImage;
 use App\Models\MerchantModels\OtpCode;
 use App\Models\MerchantModels\Verifcation;
+use App\Services\ImagesServices;
 use App\Traits\TransactionResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
@@ -142,6 +146,7 @@ class MerchantController extends Controller{
         try {
             $merchant = auth('merchant')->user();
             
+            
             if (!$merchant) {
                 return response()->json([
                     'success' => false,
@@ -149,6 +154,10 @@ class MerchantController extends Controller{
                 ], 200);
             }
 
+            $commercial_place_id = $merchant->commercialPlace->id ;
+            $merchant->commercialPlace->appointments = Appointment::where('commercial_place', $commercial_place_id)->get();
+            $merchant->commercialPlace->phoneNumbers = PhoneNumbers::where('commercial_place_id', $commercial_place_id)->get();
+            
             return response()->json([
                 'success' => true,
                 'merchant' => $merchant
@@ -159,6 +168,21 @@ class MerchantController extends Controller{
                 'message' => 'Failed to fetch merchant: ' . $e->getMessage(),
             ], 200);
         }
+    }
+
+    public function resetPassword(Request $request){
+        return $this->transactionResponseWithoutReturn(function () use ($request){
+            $validated = $request->validate([
+                'password' => 'required|string|min:6|confirmed',
+            ]);
+            $merchant = auth('merchant')->user();
+            $merchant->password = bcrypt($validated['password']);
+            $merchant->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully',
+            ], 200);
+        });
     }
 
     public function index(Request $request) {
@@ -220,7 +244,22 @@ class MerchantController extends Controller{
                 'name' => 'sometimes|required|string',
                 'commercial_place_id' => 'sometimes|nullable|integer|exists:commercial_place,id',
                 'password' => 'sometimes|required|string|min:6',
+                'image_path' => 'sometimes|nullable|file',
             ]);
+
+            if($request->hasFile('image_path')) {
+                $path = ImagesServices::uploadImage('merchant_images', $validated['image_path']);
+                $merchantImage = MerchantImage::where('merchant_id', $request->id)->get()->first();
+                if ($merchantImage) {
+                    ImagesServices::deleteImage($merchantImage->image_path);
+                    $merchantImage->delete();
+                } 
+                MerchantImage::created([
+                    'merchant_id' => $request->id,
+                    'image_path' => $path,
+                ]);
+                $validated['image_path'] = $path;
+            }
 
             if (isset($validated['password'])) {
                 $validated['password'] = bcrypt($validated['password']);

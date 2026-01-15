@@ -16,6 +16,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\FavoritePlaceController;
 use App\Http\Controllers\FavoriteProductController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\MerchantServiceController;
 use App\Http\Controllers\MethodController;
 use App\Http\Controllers\ModifierOptionsController;
 use App\Http\Controllers\ModifiersController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\MultiOfferController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderCouponController;
 use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\PhoneNumberController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductModifiersController;
 use App\Http\Controllers\RolePermissionController;
@@ -38,6 +40,13 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('admin')->group(function () {
     Route::post('/login', [AdminController::class, 'login']);
     Route::get('logout', [AdminController::class, 'logout']);
+
+    Route::prefix('merchant-services')->group(function () {
+        Route::get('/{id}', [MerchantServiceController::class, 'show']);
+        Route::get('/', [MerchantServiceController::class, 'index']);
+        Route::post('/change-state', [MerchantServiceController::class, 'changeState']);
+        Route::delete('/{id}', [MerchantServiceController::class, 'destroy']);
+    });
 
     Route::prefix('banners')->group(function () {
         Route::get('/', [AppDataController::class, 'index'])->middleware(CheckPermission::class . ':banners_management');
@@ -179,7 +188,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [SingleOfferController::class, 'index']);
         Route::get('{id}', [SingleOfferController::class, 'show']);
         Route::post('/', [SingleOfferController::class, 'store']);
-        Route::put('{id}', [SingleOfferController::class, 'update']);
+        Route::post('/update', [SingleOfferController::class, 'update']);
         Route::delete('{id}', [SingleOfferController::class, 'destroy']);
     });
     
@@ -290,25 +299,49 @@ Route::prefix('customer')->group(function () {
 });
 
 Route::prefix('commercial-place')->group(function () {
+    Route::post('merchant-services', [MerchantServiceController::class, 'store']);
+    
     Route::prefix('merchant')->group(function () {
         Route::post('/login', [MerchantController::class, 'login']);
         Route::post('/register', [MerchantController::class, 'register']);
         Route::post('/verifiyOtpCode', [MerchantController::class, 'verifiyOtpCode']);
         Route::get('/logout', [MerchantController::class, 'logout']);
-        Route::get('/getProfile', [MerchantController::class, 'getProfile'])->middleware(CheckVerification::class);
-        Route::post('/update', [MerchantController::class, 'update'])->middleware(CheckVerification::class);
+        Route::get('/getProfile', [MerchantController::class, 'getProfile']);
+        Route::post('/resetPassword', [MerchantController::class, 'resetPassword']);
+        Route::post('/update', [MerchantController::class, 'update']);
     });
 
+    Route::prefix('phone_number')->group(function () {
+        Route::get('/', [PhoneNumberController::class, 'index']);
+        Route::post('/', [PhoneNumberController::class, 'store']);
+        Route::put('{id}', [PhoneNumberController::class, 'update']);
+        Route::delete('{id}', [PhoneNumberController::class, 'destroy']);
+    });
+    
+    Route::prefix('appointments')->group(function () {
+        Route::get('/index', [AppointmentController::class, 'indexAll']);
+        Route::get('{id}', [AppointmentController::class, 'show']);
+        Route::post('/store', [AppointmentController::class, 'addAppointment']);
+        Route::put('{id}', [AppointmentController::class, 'update']);
+        Route::delete('{id}', [AppointmentController::class, 'destroy']);
+    });
 
     Route::prefix('products')->group(function () {
-        Route::get('/commercial-place-products', [ProductController::class, 'getProductsOfMerchant'])->middleware(CheckVerification::class)->middleware(CheckCommercialPlace::class);
-        Route::get('/{id}', [ProductController::class, 'show'])->middleware(CheckVerification::class)->middleware(CheckCommercialPlace::class);
-        Route::post('/{id}', [ProductController::class, 'update'])->middleware(CheckVerification::class)->middleware(CheckCommercialPlace::class);
-        Route::delete('/{id}', [ProductController::class, 'destroy'])->middleware(CheckVerification::class)->middleware(CheckCommercialPlace::class);
+        Route::get('/commercial-place-products', [ProductController::class, 'getProductsOfMerchant'])->middleware(CheckCommercialPlace::class);
+        Route::get('/{id}', [ProductController::class, 'show'])->middleware(CheckCommercialPlace::class);
+        Route::post('/{id}', [ProductController::class, 'update'])->middleware(CheckCommercialPlace::class);
+        Route::delete('/{id}', [ProductController::class, 'destroy'])->middleware(CheckCommercialPlace::class);
+        Route::get('/productVisibility', [ProductController::class, 'productVisibility']);
+        Route::get('/modifierVisibility', [ProductController::class, 'modifierVisibility']);
+        Route::get('/optionVisibility', [ProductController::class, 'optionVisibility']);
+        Route::post('/update/{id}', [ProductController::class, 'update']);
     });
 
+    //->middleware(CheckVerification::class)
     Route::prefix('orders')->group(function () {
-        Route::get('/get_orders', [OrderController::class, 'getOrdersOfMerchant'])->middleware(CheckVerification::class)->middleware(CheckCommercialPlace::class);
+        Route::get('/get_all_orders', [OrderController::class, 'getOrdersOfMerchant'])->middleware(CheckCommercialPlace::class);
+        Route::get('/get_order', [OrderController::class, 'getOrder'])->middleware(CheckCommercialPlace::class);
+        Route::post('/update_order_status', [OrderController::class, 'updateOrderStatus'])->middleware(CheckCommercialPlace::class);
     });
 
     /*Route::prefix('customer_management')->group(function () {

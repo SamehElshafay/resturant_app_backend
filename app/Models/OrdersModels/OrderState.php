@@ -14,6 +14,7 @@ class OrderState extends Model
     protected $fillable = [
         'state_id',
         'order_id',
+        'note',
         'created_at',
         'updated_at',
     ];
