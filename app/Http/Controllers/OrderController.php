@@ -8,6 +8,7 @@ use App\Models\OrdersModels\Order;
 use App\Models\OrdersModels\State;
 use App\Traits\TransactionResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller {
     use TransactionResponse;
@@ -340,6 +341,76 @@ class OrderController extends Controller {
                 'message' => 'Order status updated successfully',
                 'orders' => $order ,
             ];
+        });
+    }
+
+    public function getOrderDashboard(Request $request) {
+        return $this->transactionResponse(function () {
+            $merchant = auth('merchant')->user();
+            $merchant->commercial_place_id ;
+
+
+            $rawCounts = DB::table('order')
+                ->joinSub(
+                    DB::table('order_state')
+                        ->select('order_id', DB::raw('MAX(id) as last_state_id'))
+                        ->groupBy('order_id'),
+                    'latest_states',
+                    'order.id',
+                    '=',
+                    'latest_states.order_id'
+                )
+                ->join('order_state', 'order_state.id', '=', 'latest_states.last_state_id')
+                ->join('state', 'state.id', '=', 'order_state.state_id')
+                ->where('order.commercial_place_id', $merchant->commercial_place_id)
+                ->select(
+                    'state.state_name_en as state_name_en',
+                    'order_state.created_at as state_created_at'
+                )
+                ->get();
+
+
+
+            $dashboardStates = [
+                'pending' => ['Pending', 'Confirmed'],
+                'preparing' => ['Preparing'],
+                'rejected' => ['Rejected', 'Cancelled'],
+                'ready_to_ship' => ['Ready', 'Assigned'],
+                'on_the_way' => ['On The Way'],
+                'received' => ['Delivered', 'User Received'],
+            ];
+
+            $dashboardCounts = array_fill_keys(array_keys($dashboardStates), 0) ;
+
+            $dashboardCounts = array_fill_keys(array_keys($dashboardStates), 0);
+
+            $todayOnlyStates = [
+                'rejected',
+                'received',
+            ];
+
+            foreach ($dashboardStates as $key => $states) {
+                foreach ($rawCounts as $row) {
+
+                    if (!in_array($row->state_name_en, $states)) {
+                        continue;
+                    }
+
+                    if (in_array($key, $todayOnlyStates)) {
+                        if (\Carbon\Carbon::parse($row->created_at)->isToday()) {
+                            $dashboardCounts[$key]++;
+                        }
+                    } 
+                    else {
+                        $dashboardCounts[$key]++;
+                    }
+                }
+            }
+
+
+            
+
+            return $dashboardCounts ;
         });
     }
 }
