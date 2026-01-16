@@ -207,12 +207,12 @@ class OrderController extends Controller {
             ]);
 
             $stateMap = [
-                'pending' => ['Pending', 'Confirmed'],
-                'preparing' => ['Preparing'],
-                'rejected' => ['Rejected', 'Cancelled'],
-                'ready' => ['Ready', 'Assigned'],
-                'assigned' => ['Assigned'],
-                'delivered' => ['Delivered', 'User Received'],
+                'pending'    => ['Pending', 'Confirmed'],
+                'preparing'  => ['Preparing'],
+                'rejected'   => ['Rejected', 'Cancelled'],
+                'ready'      => ['Ready', 'Assigned'],
+                'assigned'   => ['Assigned'],
+                'delivered'  => ['Delivered', 'User Received'],
             ];
 
             $states = $stateMap[$request->state];
@@ -358,6 +358,116 @@ class OrderController extends Controller {
     public function getOrderDashboard(Request $request) {
         return $this->transactionResponse(function () {
             $merchant = auth('merchant')->user();
+
+            $rows = DB::table('orders as o')
+                ->joinSub(
+                    DB::table('order_state')
+                        ->select('order_id', DB::raw('MAX(id) as last_state_id'))
+                        ->groupBy('order_id'),
+                    'ls',
+                    'o.id',
+                    '=',
+                    'ls.order_id'
+                )
+                ->join('order_state as os', 'os.id', '=', 'ls.last_state_id')
+                ->join('state as s', 's.id', '=', 'os.state_id')
+                ->where('o.commercial_place_id', $merchant->commercial_place_id)
+                ->select(
+                    DB::raw("
+                        CASE
+                            WHEN s.state_name_en IN ('Pending','Confirmed') THEN 'pending'
+                            WHEN s.state_name_en = 'Preparing' THEN 'preparing'
+                            WHEN s.state_name_en IN ('Rejected','Cancelled')
+                                AND DATE(os.created_at) = CURDATE() THEN 'rejected'
+                            WHEN s.state_name_en IN ('Ready','Assigned') THEN 'ready_to_ship'
+                            WHEN s.state_name_en = 'On The Way' THEN 'on_the_way'
+                            WHEN s.state_name_en IN ('Delivered','User Received')
+                                AND DATE(os.created_at) = CURDATE() THEN 'received'
+                            ELSE NULL
+                        END as dashboard_key
+                    "),
+                    DB::raw('COUNT(*) as total')
+                )
+                ->groupBy('dashboard_key')
+                ->get()
+                ->pluck('total', 'dashboard_key');
+
+            $defaults = [
+                'pending' => 0,
+                'preparing' => 0,
+                'rejected' => 0,
+                'ready_to_ship' => 0,
+                'on_the_way' => 0,
+                'received' => 0,
+            ];
+
+            $counts = array_merge($defaults, $rows->toArray());
+
+            return [
+                "pending" => [
+                    "count" => $counts['pending'],
+                    "states" => "في الانتظار",
+                ],
+                "preparing" => [
+                    "count" => $counts['preparing'],
+                    "states" => "قيد التجهيز",
+                ],
+                "rejected" => [
+                    "count" => $counts['rejected'],
+                    "states" => "مرفوض (اليوم)",
+                ],
+                "ready_to_ship" => [
+                    "count" => $counts['ready_to_ship'],
+                    "states" => "جاهز للإرسال",
+                ],
+                "on_the_way" => [
+                    "count" => $counts['on_the_way'],
+                    "states" => "في الطريق",
+                ],
+                "received" => [
+                    "count" => $counts['received'],
+                    "states" => "تم الاستلام (اليوم)",
+                ],
+            ];
+        });
+    }
+
+
+    public function getOrderByStatus(Request $request) {
+        return $this->transactionResponse(function () use ($request) {
+
+            $validated = $request->validate([
+                'status' => 'required|string|in:Received,Rejected,Cancelled',
+            ]);
+
+            $merchant = auth('merchant')->user();
+
+            $orders = DB::table('order as o')
+                ->joinSub(
+                    DB::table('order_state')
+                        ->select('order_id', DB::raw('MAX(id) as last_state_id'))
+                        ->groupBy('order_id'),
+                    'ls',
+                    'o.id',
+                    '=',
+                    'ls.order_id'
+                )
+                ->join('order_state as os', 'os.id', '=', 'ls.last_state_id')
+                ->join('state as s', 's.id', '=', 'os.state_id')
+                ->where('o.commercial_place_id', $merchant->commercial_place_id)
+                ->where('s.state_name_en', $validated['status'])
+                ->get();
+
+            return [
+                'status' => $validated['status'],
+                'orders'  => $orders,
+            ];
+        });
+    }
+
+    /*public function getOrderDashboard(Request $request) {
+        return $this->transactionResponse(function () {
+            $merchant = auth('merchant')->user();
             $merchant->commercial_place_id ;
 
 
@@ -391,7 +501,7 @@ class OrderController extends Controller {
                 'received' => ['Delivered', 'User Received'],
             ];
 
-            $dashboardCounts = array_fill_keys(array_keys($dashboardStates), 0) ;
+            
 
             $dashboardCounts = array_fill_keys(array_keys($dashboardStates), 0);
 
@@ -445,5 +555,32 @@ class OrderController extends Controller {
                 ]
             ] ;
         });
+    }*/
+
+    /*public function getOrders(Request $request) {
+        return $this->transactionResponseWithoutReturn(function () use ($request) {
+            $validator = validator($request->all(), [
+                'state' => 'nullable|string|in:pending',
+            ]);
+            $states = $this->resolveDbStatesFromDashboardState($request->state);
+
+            $orders = Order::with('latestState.state')
+                ->where('commercial_place_id', $merchant->commercial_place_id)
+                ->whereHas('latestState.state', function ($q) use ($states) {
+                    $q->whereIn('state_name_en', $states);
+                })
+                ->latest()
+                ->paginate(10);
+        });
+    }*/
+
+    private function resolveDbStatesFromDashboardState(string $state): array{
+        static $map = [
+            'arrived'  => ['Delivered', 'User Received'],
+            'rejected' => ['Rejected'],
+        ];
+
+        return $map[$state] ?? [];
     }
+
 }

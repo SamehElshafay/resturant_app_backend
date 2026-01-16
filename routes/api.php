@@ -357,6 +357,7 @@ Route::prefix('commercial-place')->group(function () {
     Route::prefix('orders')->group(function () {
         Route::get('/get_all_orders', [OrderController::class, 'getOrdersOfMerchant'])->middleware(CheckCommercialPlace::class);
         Route::get('/get_order', [OrderController::class, 'getOrder'])->middleware(CheckCommercialPlace::class);
+        Route::get('/getOrderByStatus', [OrderController::class, 'getOrderByStatus'])->middleware(CheckCommercialPlace::class);
         Route::get('/getOrderDashboard', [OrderController::class, 'getOrderDashboard'])->middleware(CheckCommercialPlace::class);
         Route::post('/update_order_status', [OrderController::class, 'updateOrderStatus'])->middleware(CheckCommercialPlace::class);
     });
