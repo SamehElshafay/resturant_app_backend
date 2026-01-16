@@ -30,6 +30,7 @@ class State extends Model
     public function getNameAttribute() {
         return $this->state_name_en;
     }
+    
     public function orderStates() {
         return $this->hasMany(OrderState::class, 'state_id');
     }

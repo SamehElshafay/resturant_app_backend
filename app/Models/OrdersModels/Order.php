@@ -51,7 +51,7 @@ class Order extends Model
     }
 
     public function latestState() {
-        return $this->hasOne(OrderState::class, 'order_id')->latest();
+        return $this->hasOne(OrderState::class, 'order_id')->latestOfMany();
     }
 
     public function payment_method(){

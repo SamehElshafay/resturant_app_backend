@@ -212,7 +212,6 @@ class OrderController extends Controller {
                     $q->where('state_name_en', $state);
                 })
                 ->latest()
-                ->orderBy('created_at', 'desc')
                 ->paginate(10);
 
             return [
