@@ -199,25 +199,35 @@ class OrderController extends Controller {
 
     public function getOrdersOfMerchant(Request $request) {
         return $this->transactionResponseWithoutReturn(function () use ($request) {
+
             $merchant = auth('merchant')->user();
 
             $validator = validator($request->all(), [
                 'state' => 'required|string|in:pending,ready,preparing,assigned,rejected,delivered',
             ]);
 
-            $state = ucfirst($request->state);
+            $stateMap = [
+                'pending' => ['Pending', 'Confirmed'],
+                'preparing' => ['Preparing'],
+                'rejected' => ['Rejected', 'Cancelled'],
+                'ready' => ['Ready', 'Assigned'],
+                'assigned' => ['Assigned'],
+                'delivered' => ['Delivered', 'User Received'],
+            ];
+
+            $states = $stateMap[$request->state];
 
             $orders = Order::with('latestState.state')
                 ->where('commercial_place_id', $merchant->commercial_place_id)
-                ->whereHas('latestState.state', function ($q) use ($state) {
-                    $q->where('state_name_en', $state);
+                ->whereHas('latestState.state', function ($q) use ($states) {
+                    $q->whereIn('state_name_en', $states);
                 })
                 ->latest()
                 ->paginate(10);
 
             return [
                 'success' => true,
-                'orders' => $orders->getCollection() ,
+                'orders' => $orders->getCollection(),
                 'meta' => [
                     'current_page' => $orders->currentPage(),
                     'last_page'    => $orders->lastPage(),
@@ -227,6 +237,7 @@ class OrderController extends Controller {
             ];
         });
     }
+
 
     public function updateOrderStatus(Request $request) {
         return $this->transactionResponseWithoutReturn(function () use ($request) {
