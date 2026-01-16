@@ -23,6 +23,13 @@ class State extends Model
         'updated_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'name',
+    ];
+
+    public function getNameAttribute() {
+        return $this->state_name_en;
+    }
     public function orderStates() {
         return $this->hasMany(OrderState::class, 'state_id');
     }
