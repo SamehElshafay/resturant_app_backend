@@ -13,6 +13,8 @@ use App\Http\Controllers\CommercialPlaceController;
 use App\Http\Controllers\CommissionTypeController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DriverController;
+use App\Http\Controllers\DriverServiceController;
 use App\Http\Controllers\FavoritePlaceController;
 use App\Http\Controllers\FavoriteProductController;
 use App\Http\Controllers\MerchantController;
@@ -41,11 +43,25 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [AdminController::class, 'login']);
     Route::get('logout', [AdminController::class, 'logout']);
 
+    Route::prefix('driver')->group(function () {
+        Route::get('/{id}', [DriverController::class, 'show']);
+        Route::get('/', [DriverController::class, 'index']);
+        Route::post('/add-driver', [DriverController::class, 'addDriver']);
+        Route::post('/update-driver', [DriverController::class, 'updateDriver']);
+    });
+
     Route::prefix('merchant-services')->group(function () {
         Route::get('/{id}', [MerchantServiceController::class, 'show']);
         Route::get('/', [MerchantServiceController::class, 'index']);
         Route::post('/change-state', [MerchantServiceController::class, 'changeState']);
         Route::delete('/{id}', [MerchantServiceController::class, 'destroy']);
+    });
+
+    Route::prefix('driver-services')->group(function () {
+        Route::get('/{id}', [DriverServiceController::class, 'show']);
+        Route::get('/', [DriverServiceController::class, 'index']);
+        Route::post('/change-state', [DriverServiceController::class, 'changeState']);
+        Route::delete('/{id}', [DriverServiceController::class, 'destroy']);
     });
 
     Route::prefix('banners')->group(function () {
@@ -351,6 +367,20 @@ Route::prefix('commercial-place')->group(function () {
     });*/
 });
 
+Route::prefix('driver')->group(function () {
+    Route::post('driver-services', [DriverServiceController::class, 'store']);
+    Route::prefix('auth')->group(function () {
+        Route::post('/login', [DriverController::class, 'login']);
+        Route::get('/logout', [DriverController::class, 'logout']);
+    });
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/getProfile', [DriverController::class, 'getProfile']);
+        Route::post('/changePassword', [DriverController::class, 'changePassword']);
+        Route::post('/updateDriver', [DriverController::class, 'update']);
+    });
+
+});
 
 /*git add .
 git commit -m "update"

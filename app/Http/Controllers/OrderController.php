@@ -132,7 +132,7 @@ class OrderController extends Controller {
                 'order_id' => 'required|integer|exists:order,id',
             ]);
 
-            $order = Order::with(['orderItems','latestState','commercial_place','orderStates' ,'address'])->findOrFail($request->order_id);
+            $order = Order::with(['customer','orderItems','latestState','commercial_place','orderStates' ,'address'])->findOrFail($request->order_id);
 
             $nextState = [
                 'Pending' => [

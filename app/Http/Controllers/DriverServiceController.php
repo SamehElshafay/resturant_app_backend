@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MerchantModels\MerchantServiceState;
-use App\Models\MerchantModels;
-use App\Models\MerchantModels\MerchantService;
+use App\Models\DriverModels\DriverService;
+use App\Models\DriverModels\DriverServiceState;
 use App\Models\MerchantModels\MerchantServState;
 use App\Traits\TransactionResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
-class MerchantServiceController extends Controller {
+class DriverServiceController extends Controller {
     use TransactionResponse;
 
     public function store(Request $request) {
@@ -21,17 +19,17 @@ class MerchantServiceController extends Controller {
                     'country_code' => 'required|string|max:5',
                 ]);
 
-                if (MerchantService::where('phone_number', $data['phone_number'])->exists()) {
+                if (DriverService::where('phone_number', $data['phone_number'])->exists()) {
                     throw new \Exception('your request is already submitted and under review' , 500 );
                 }
 
-                $service = MerchantService::create([
+                $service = DriverService::create([
                     'phone_number' => $data['phone_number'],
                     'country_code' => $data['country_code'],
                 ]);
 
-                MerchantServiceState::create([
-                    'merchant_services_id' => $service->id,
+                DriverServiceState::create([
+                    'driver_services_id' => $service->id,
                     'state_id'             => 1 ,
                     'note'                 => $data['note'] ?? 'Initial state',
                 ]);
@@ -47,7 +45,7 @@ class MerchantServiceController extends Controller {
     public function show(int $id) {
         return$this->transactionResponseWithoutReturn(
             function () use ($id) {
-                $service = MerchantService::with([
+                $service = DriverService::with([
                     'latestState.state',
                     'states.state'
                 ])->findOrFail($id);
@@ -72,7 +70,7 @@ class MerchantServiceController extends Controller {
                     'phone_number' => 'nullable|string|max:100',
                 ]);
 
-                $service = MerchantService::with([
+                $service = DriverService::with([
                     'latestState.state',
                 ])->where(function($query) use ($validated) {
                     if (isset($validated['phone_number'])) {
@@ -102,8 +100,8 @@ class MerchantServiceController extends Controller {
                     'note'     => 'nullable|string',
                     'state'    => 'nullable|string|in:cancele' ,
                 ]);
-                
-                $service = MerchantService::findOrFail($data['id']);
+
+                $service = DriverService::findOrFail($data['id']);
 
                 $status_id = $request->state == 'cancele' ? 5 : $service->latestState->state_id + 1;
 
@@ -113,8 +111,8 @@ class MerchantServiceController extends Controller {
                     throw new \Exception('No further state available for this service', 400);
                 }
 
-                MerchantServiceState::create([
-                    'merchant_services_id' => $service->id,
+                DriverServiceState::create([
+                    'driver_services_id' => $service->id,
                     'state_id'             => $nextState->id,
                     'note'                 => $data['note'] ?? null,
                 ]);
@@ -131,11 +129,11 @@ class MerchantServiceController extends Controller {
     }
 
     public function destroy(int $id) {
-        $service = MerchantService::findOrFail($id);
+        $service = DriverService::findOrFail($id);
         // حذف الهيستوري الأول
         $service->states()->delete();
         $service->delete();
 
-        return response()->json(['message' => 'Merchant service deleted']);
+        return response()->json(['message' => 'Driver service deleted']);
     }
 }

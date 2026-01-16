@@ -2,7 +2,7 @@
 
 namespace App\Models\CustomerModel;
 
-use App\Models\Coupon;
+use App\Models\CouponModels\Coupons;
 use App\Models\LoyaltyPoint;
 use App\Models\MerchantModels\Verifcation;
 use App\Models\OrdersModels\Order;
@@ -45,7 +45,7 @@ class Customer extends Authenticatable implements JWTSubject {
     }
 
     public function coupons() {
-        return $this->belongsToMany(Coupon::class, 'user_coupon', 'customer_id', 'coupon_id')->withPivot('is_used')->withTimestamps();
+        return $this->belongsToMany(Coupons::class, 'user_coupon', 'customer_id', 'coupon_id')->withPivot('is_used')->withTimestamps();
     }
 
     public function loyaltyPoints() {
