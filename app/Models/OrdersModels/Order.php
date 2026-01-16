@@ -4,6 +4,7 @@ namespace App\Models\OrdersModels;
 
 use App\Models\CommercialPlaceModels\CommercialPlace;
 use App\Models\CustomerModel\Address;
+use App\Models\CustomerModel\Customer;
 use App\Models\Method;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -71,6 +72,10 @@ class Order extends Model
     
     public function other_user(){
         return $this->hasOne(OtherUser::class, 'order_id');
+    }
+
+    public function customer(){
+        return $this->belongsTo(Customer::class, 'user_id');
     }
 
     /*// العلاقة مع Driver
