@@ -407,10 +407,32 @@ class OrderController extends Controller {
                 }
             }
 
-
-            
-
-            return $dashboardCounts ;
+            return [
+                "pending" => [
+                    "count" => $dashboardCounts['pending'],
+                    "states" => "في الانتظار",
+                ],
+                "preparing" => [
+                    "count" => $dashboardCounts['preparing'],
+                    "states" => "قيد التجهيز",
+                ],
+                "rejected" => [
+                    "count" => $dashboardCounts['rejected'],
+                    "states" => "مرفوض",
+                ],
+                "ready_to_ship" => [
+                    "count" => $dashboardCounts['ready_to_ship'],
+                    "states" => "جاهز للارسال",
+                ],
+                "on_the_way" => [
+                    "count" => $dashboardCounts['on_the_way'],
+                    "states" => "تم الاستلام",
+                ],
+                "received" => [
+                    "count" => $dashboardCounts['received'],
+                    "states" => "واصل",
+                ]
+            ] ;
         });
     }
 }
