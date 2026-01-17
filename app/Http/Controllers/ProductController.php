@@ -310,7 +310,6 @@ class ProductController extends Controller {
 
     public function productVisibility(Request $request){
         DB::beginTransaction();
-
         try {
             $validated = $request->validate([
                 'product_id' => 'required|integer|exists:product,id',

@@ -348,9 +348,9 @@ Route::prefix('commercial-place')->group(function () {
         Route::get('/{id}', [ProductController::class, 'show'])->middleware(CheckCommercialPlace::class);
         Route::post('/{id}', [ProductController::class, 'update'])->middleware(CheckCommercialPlace::class);
         Route::delete('/{id}', [ProductController::class, 'destroy'])->middleware(CheckCommercialPlace::class);
-        Route::get('/productVisibility', [ProductController::class, 'productVisibility']);
-        Route::get('/modifierVisibility', [ProductController::class, 'modifierVisibility']);
-        Route::get('/optionVisibility', [ProductController::class, 'optionVisibility']);
+        Route::get('/product-visibility', [ProductController::class, 'productVisibility']);
+        Route::get('/modifier-visibility', [ProductController::class, 'modifierVisibility']);
+        Route::get('/option-visibility', [ProductController::class, 'optionVisibility']);
         Route::post('/update/{id}', [ProductController::class, 'update']);
     });
 

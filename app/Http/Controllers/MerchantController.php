@@ -265,7 +265,7 @@ class MerchantController extends Controller{
                 $validated['password'] = bcrypt($validated['password']);
             }
 
-            $merchant = Merchant::findOrFail($request->id);
+            $merchant = auth()->guard('merchant')->user();
 
             if (!$merchant) {
                 Throw ValidationException::withMessages([
