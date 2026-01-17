@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DriverModels\Driver;
+use App\Models\DriverModels\DriverLocation;
 use App\Services\ImagesServices;
 use App\Traits\TransactionResponse;
 use Illuminate\Http\Request;
@@ -188,5 +189,79 @@ class DriverController extends Controller {
                 'data' => $driver,
             ]);
         });
+    }
+    
+    ///////////////////////////////////////// location
+    
+    public function allDriversLocation(Request $request) {
+        $query = DriverLocation::query();
+
+        if ($request->filled('driver_id')) {
+            $query->where('driver_id', $request->driver_id);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $query->latest()->paginate(10),
+        ]);
+    }
+
+    public function locateDriver(Request $request) {
+        $validated = $request->validate([
+            'driver_id' => 'required|integer|exists:drivers,id',
+            'lat'       => 'required|numeric',
+            'lng'       => 'required|numeric',
+        ]);
+
+        $location = DriverLocation::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'data' => $location,
+        ], 201);
+    }
+
+    public function getDriverLocation($id) {
+        $location = DriverLocation::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $location,
+        ]);
+    }
+
+    public function updateDriverLocation(Request $request, $id) {
+        $location = DriverLocation::findOrFail($id);
+
+        $validated = $request->validate([
+            'lat' => 'sometimes|required|numeric',
+            'lng' => 'sometimes|required|numeric',
+        ]);
+
+        $location->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'data' => $location,
+        ]);
+    }
+
+    public function destroyDriverLocation($id) {
+        $location = DriverLocation::findOrFail($id);
+        $location->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Driver location deleted successfully',
+        ]);
+    }
+
+    public function lastLocation($driverId) {
+        $location = DriverLocation::where('driver_id', $driverId)->latest()->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => $location,
+        ]);
     }
 }

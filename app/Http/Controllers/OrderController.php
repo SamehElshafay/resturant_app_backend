@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerModel\Wallet;
+use App\Models\DriverModels\OrderDriver;
 use App\Models\OrdersModels\OrderState;
 use App\Models\OrdersModels\Order;
 use App\Models\OrdersModels\State;
+use App\Services\LocationServices;
+use App\Services\OrderServices;
 use App\Traits\TransactionResponse;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 
 class OrderController extends Controller {
     use TransactionResponse;
@@ -238,9 +243,8 @@ class OrderController extends Controller {
         });
     }
 
-
-    public function updateOrderStatus(Request $request) {
-        return $this->transactionResponseWithoutReturn(function () use ($request) {
+    public function updateOrderStatus(Request $request , OrderServices $orderServices) {
+        return $this->transactionResponseWithoutReturn(function () use ($request , $orderServices) {
             $merchant = auth('merchant')->user();
 
             $validator = validator($request->all(), [
@@ -250,102 +254,29 @@ class OrderController extends Controller {
                 'note'  => 'nullable|string',
             ]);
 
-            $order = Order::findOrFail($request->order_id);
-            
-            if ($request->preparation_time) {
-                if($order->time_order == null){
-                    $order->time_order = now()->addMinutes($request->preparation_time);
-                } else {
-                    $order->time_order = $order->time_order->addMinutes($request->preparation_time);
-                }
-            }
+            $order = Order::with('commercial_place')->findOrFail($request->order_id);
+            $orderServices->increasePreparationTime($order , $request->preparation_time);
 
             $currentState = $order->latestState->state ;
             $newState = ucfirst($request->state);
             
-            $allowedTransitions = [
-                'Pending' => ['Confirmed', 'Rejected'],
-                'Confirmed' => ['Preparing', 'Rejected'],
-                'Preparing' => ['Ready', 'Rejected'],
-                'Ready' => ['Assigned', 'Rejected'],
-                'Assigned' => ['On The Way', 'Rejected'],
-                'On The Way' => ['Delivered', 'Rejected'],
-                'Delivered' => ['User Received'],
-            ];
-            
-            if (!isset($allowedTransitions[$currentState->state_name_en]) ||
-                !in_array($newState, $allowedTransitions[$currentState->state_name_en])) {
-                throw new \Exception("Invalid state transition from {$currentState->state_name_en} to {$newState}");
-            }
+            $orderServices->isAllowedToChangeStatus($currentState->state_name_en , $newState);
 
+            $orderServices->order_assigning($order , $newState);
+            
             $state = State::where('state_name_en', $newState)->get()->first();
             
             $orderState = OrderState::create(['state_id' => $state->id ,'order_id' => $request->order_id]);
             
+            $order->status_id = $state->id ;            
+            
             if($request->note && $state->state_name_en == 'Rejected'){
                 $orderState->note = $request->note ;
             }
-            
-            $nextState = [
-                'Pending' => [
-                    [
-                        'actionName' => 'الموافقة',
-                        'state' => 'confirmed',
-                    ],
-                    [
-                        'actionName' => 'رفض الطلب',
-                        'state' => 'rejected',
-                    ],
-                ],
-                'Confirmed' => [
-                    [
-                        'actionName' => 'البدء بتحضير الطلب',
-                        'state' => 'preparing',
-                    ],
-                    [
-                        'actionName' => 'رفض الطلب',
-                        'state' => 'rejected',
-                    ],
-                ],
-                'Preparing' => [
-                    [
-                        'actionName' => 'الطلب جاهز',
-                        'state' => 'ready',
-                    ],
-                ],
-                'Ready' => [
-                    [
-                        'actionName' => 'التسليم',
-                        'state' => 'assigned',
-                    ],
-                ],
-                'Assigned' => [
-                    [
-                        'actionName' => 'في الطريق',
-                        'state' => 'end case',//'on_the_way',
-                    ],
-                ],
-                'On The Way' => [
-                    [
-                        'actionName' => 'في الطريق', //'تم التسليم',
-                        'state' => 'end case' //'delivered',
-                    ],
-                ],
-                'Delivered' => [
-                    [
-                        'actionName' => 'تم التسليم',
-                        'state' => 'end case' //'user_received',
-                    ],
-                ],
-                'User Received' => [
-                    [
-                        'actionName' => 'العميل استلم',
-                        'state' => 'end case'
-                    ],
-                ],
-            ];
 
-            $order->nextState = $nextState[$newState];
+            $order->save();
+
+            $order->nextState = $orderServices->get_next_status($newState);
 
             return [
                 'success' => true,
@@ -465,69 +396,11 @@ class OrderController extends Controller {
         });
     }
 
-    /*public function getOrderDashboard(Request $request) {
+    /*public function getDriverOrderDashboard(Request $request) {
         return $this->transactionResponse(function () {
-            $merchant = auth('merchant')->user();
-            $merchant->commercial_place_id ;
-
-
-            $rawCounts = DB::table('order')
-                ->joinSub(
-                    DB::table('order_state')
-                        ->select('order_id', DB::raw('MAX(id) as last_state_id'))
-                        ->groupBy('order_id'),
-                    'latest_states',
-                    'order.id',
-                    '=',
-                    'latest_states.order_id'
-                )
-                ->join('order_state', 'order_state.id', '=', 'latest_states.last_state_id')
-                ->join('state', 'state.id', '=', 'order_state.state_id')
-                ->where('order.commercial_place_id', $merchant->commercial_place_id)
-                ->select(
-                    'state.state_name_en as state_name_en',
-                    'order_state.created_at as state_created_at'
-                )
-                ->get();
-
-
-
-            $dashboardStates = [
-                'pending' => ['Pending', 'Confirmed'],
-                'preparing' => ['Preparing'],
-                'rejected' => ['Rejected', 'Cancelled'],
-                'ready_to_ship' => ['Ready', 'Assigned'],
-                'on_the_way' => ['On The Way'],
-                'received' => ['Delivered', 'User Received'],
-            ];
+            $merchant = auth('driver')->user();
 
             
-
-            $dashboardCounts = array_fill_keys(array_keys($dashboardStates), 0);
-
-            $todayOnlyStates = [
-                'rejected',
-                'received',
-            ];
-
-            foreach ($dashboardStates as $key => $states) {
-                foreach ($rawCounts as $row) {
-
-                    if (!in_array($row->state_name_en, $states)) {
-                        continue;
-                    }
-
-                    if (in_array($key, $todayOnlyStates)) {
-                        if (\Carbon\Carbon::parse($row->created_at)->isToday()) {
-                            $dashboardCounts[$key]++;
-                        }
-                    } 
-                    else {
-                        $dashboardCounts[$key]++;
-                    }
-                }
-            }
-
             return [
                 "pending" => [
                     "count" => $dashboardCounts['pending'],

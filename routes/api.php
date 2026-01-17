@@ -14,6 +14,7 @@ use App\Http\Controllers\CommissionTypeController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\DriverRequestController;
 use App\Http\Controllers\DriverServiceController;
 use App\Http\Controllers\FavoritePlaceController;
 use App\Http\Controllers\FavoriteProductController;
@@ -381,6 +382,21 @@ Route::prefix('driver')->group(function () {
         Route::post('/changePassword', [DriverController::class, 'changePassword']);
         Route::post('/updateDriver', [DriverController::class, 'update']);
     });
+
+    Route::prefix('driver-requests')->group(function () {
+        Route::get('/', [DriverRequestController::class, 'index']);
+        Route::post('', [DriverRequestController::class, 'store']);
+        Route::get('/{id}', [DriverRequestController::class, 'show']);
+        Route::put('/{id}', [DriverRequestController::class, 'update']);
+        Route::delete('/{id}', [DriverRequestController::class, 'destroy']);
+    });
+
+    Route::prefix('dashboard')->group(function (){
+        Route::get('/getDashboard', [DriverRequestController::class, 'getDashboard']);
+        Route::get('/getOrderDashboard', [DriverRequestController::class, 'getOrderDashboard']);
+        Route::put('/{id}', [DriverRequestController::class, 'updateOrderStatus']);
+    });
+
 
 });
 

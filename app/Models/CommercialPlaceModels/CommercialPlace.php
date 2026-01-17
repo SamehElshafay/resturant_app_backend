@@ -36,7 +36,7 @@ class CommercialPlace extends Model {
 
     protected $with = [
         //'phoneNumbers',
-        //'locations',
+        'location',
         //'images',
         //'commission',
         //'appointment',
