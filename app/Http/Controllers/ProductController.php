@@ -408,8 +408,9 @@ class ProductController extends Controller {
             ]);
 
             $productModifier = ProductModifier::where('product_id', $validated['product_id'])
-                ->where('modifier_id', $validated['modifier_id'])
-                ->update(['active' => 0]);
+                ->where('modifier_id', $validated['modifier_id'])->get()->first();
+
+            $productModifier->update(['active' => 0]);
 
             $productModifierOptions = ProductModifierOptions::where('product_modifiers_id', $productModifier->id)
                 ->where('option_id', $validated['option_id'])->get()->first();

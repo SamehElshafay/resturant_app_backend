@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Services;
+
 use App\Models\CustomerModel\CustomerSmsLog;
 use Illuminate\Support\Facades\Http;
 

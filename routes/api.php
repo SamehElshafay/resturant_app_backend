@@ -343,14 +343,17 @@ Route::prefix('commercial-place')->group(function () {
         Route::delete('{id}', [AppointmentController::class, 'destroy']);
     });
 
+    Route::prefix('visibilty')->group(function (){
+        Route::get('product-visibility', [ProductController::class, 'productVisibility']);
+        Route::get('modifier-visibility', [ProductController::class, 'changeModifierVisibility']);
+        Route::get('option-visibility', [ProductController::class, 'optionVisibility']);
+    });
+    
     Route::prefix('products')->group(function () {
         Route::get('/commercial-place-products', [ProductController::class, 'getProductsOfMerchant'])->middleware(CheckCommercialPlace::class);
         Route::get('/{id}', [ProductController::class, 'show'])->middleware(CheckCommercialPlace::class);
         Route::post('/{id}', [ProductController::class, 'update'])->middleware(CheckCommercialPlace::class);
         Route::delete('/{id}', [ProductController::class, 'destroy'])->middleware(CheckCommercialPlace::class);
-        Route::get('/product-visibility', [ProductController::class, 'productVisibility']);
-        Route::get('/modifier-visibility', [ProductController::class, 'modifierVisibility']);
-        Route::get('/option-visibility', [ProductController::class, 'optionVisibility']);
         Route::post('/update/{id}', [ProductController::class, 'update']);
     });
 

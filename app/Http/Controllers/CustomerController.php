@@ -7,13 +7,13 @@ use App\Models\CustomerModel\Customer;
 use App\Models\CustomerModel\OtpCodeCustomer;
 use App\Models\CustomerModel\Wallet;
 use App\Models\MerchantModels\Verifcation;
+use App\Services\SMS;
 use App\Traits\TransactionResponse;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use SMS;
 
 class CustomerController extends Controller {
     use TransactionResponse;
@@ -279,11 +279,17 @@ class CustomerController extends Controller {
             //$customer = auth('customer')->user();
             $customer = Customer::where('phone_number', $validated['phone_number'])->first() ;
             
+            $credentials = [
+                'phone_number' => $validated['phone_number'],
+                'password' => "12345678",
+            ];
+
+                
             if (!$customer) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Customer not found'
-                ], 404);
+                ], 400);
             }
 
             $otpCode = OtpCodeCustomer::where('user_id', $customer->id)->where('code', $validated['otp_code']);
@@ -295,10 +301,12 @@ class CustomerController extends Controller {
                 ], 400);
             }
 
+           // return 's';
             $otpCode->delete();
-            $verifcation = Verifcation::findOrFail($customer->verifcation_id);
+            $token = auth()->guard('customer')->attempt($credentials) ;
+            /*$verifcation = Verifcation::findOrFail($customer->verifcation_id);
             $verifcation->is_verified = true;
-            $verifcation->save();
+            $verifcation->save();*/
 
             $sms = new SMS();
             $sms->verify_sms_operation($customer->id);
@@ -306,13 +314,14 @@ class CustomerController extends Controller {
             return response()->json([
                 'success' => true,
                 'message' => 'OTP code sent successfully to ' ,
+                'token' => $token
             ], 200);
 
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'errors' => $e->errors(),
-            ], 422);
+            ], 400);
         }
     }
 
@@ -426,16 +435,16 @@ class CustomerController extends Controller {
         $code = rand(100000, 999999) ;
         $sms = new SMS();
         
-        $result = $sms->sendSms(
+        /*$result = $sms->sendSms(
             $phone_number,
             'Your NOW App OTP is: ' . $code . '. Do not share this code.' ,
             $user_id ,
             $operation_type
-        );
+        );*/
 
-        if (!$result['success']) {
+        /*if (!$result['success']) {
             Throw new Exception('Failed to send SMS: ' . $result['message']);
-        }
+        }*/
 
         $code = OtpCodeCustomer::create([
             'code' => $code,
