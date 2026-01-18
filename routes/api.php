@@ -344,11 +344,11 @@ Route::prefix('commercial-place')->group(function () {
     });
 
     Route::prefix('visibilty')->group(function (){
-        Route::get('product-visibility', [ProductController::class, 'productVisibility']);
-        Route::get('modifier-visibility', [ProductController::class, 'changeModifierVisibility']);
-        Route::get('option-visibility', [ProductController::class, 'optionVisibility']);
+        Route::get('productVisibility', [ProductController::class, 'productVisibility']);
+        Route::get('modifierVisibility', [ProductController::class, 'modifierVisibility']);
+        Route::get('optionVisibility', [ProductController::class, 'optionVisibility']);
     });
-    
+
     Route::prefix('products')->group(function () {
         Route::get('/commercial-place-products', [ProductController::class, 'getProductsOfMerchant'])->middleware(CheckCommercialPlace::class);
         Route::get('/{id}', [ProductController::class, 'show'])->middleware(CheckCommercialPlace::class);
