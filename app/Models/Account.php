@@ -4,14 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasBilingualName;
+use App\Traits\AutoCastTypes;
 
 class Account extends Model
 {
-    use HasBilingualName;
+    use HasBilingualName, AutoCastTypes;
 
     protected $fillable = ['branch_id', 'parent_id', 'name', 'name_ar', 'name_en', 'code', 'type'];
 
     protected $casts = [
+        'id' => 'integer',
         'branch_id' => 'integer',
         'parent_id' => 'integer',
         'type' => 'integer',

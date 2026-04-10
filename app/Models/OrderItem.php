@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AutoCastTypes;
 
 class OrderItem extends Model
 {
+    use AutoCastTypes;
     protected $fillable = [
         'order_id',
         'product_id',

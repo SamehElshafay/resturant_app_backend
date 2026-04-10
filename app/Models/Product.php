@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasBilingualName;
+use App\Traits\AutoCastTypes;
 
 class Product extends Model
 {
-    use HasBilingualName;
+    use HasBilingualName, AutoCastTypes;
 
     protected $fillable = ['category_id', 'name', 'name_ar', 'name_en', 'image', 'base_purchase_price'];
 

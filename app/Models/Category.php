@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasBilingualName;
+use App\Traits\AutoCastTypes;
 
 class Category extends Model
 {
-    use HasBilingualName;
+    use HasBilingualName, AutoCastTypes;
 
     protected $fillable = [
         'name',

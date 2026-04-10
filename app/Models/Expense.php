@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AutoCastTypes;
 
 class Expense extends Model
 {
+    use AutoCastTypes;
     protected $fillable = [
         'branch_id',
         'account_id',

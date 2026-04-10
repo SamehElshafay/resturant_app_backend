@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AutoCastTypes;
 
 class Order extends Model
 {
+    use AutoCastTypes;
     protected $fillable = [
         'branch_id',
         'cashier_id',

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AutoCastTypes;
 
 class Zone extends Model
 {
+    use AutoCastTypes;
     protected $fillable = ['branch_id', 'name'];
 
     protected $casts = [

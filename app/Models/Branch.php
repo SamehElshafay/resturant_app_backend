@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasBilingualName;
+use App\Traits\AutoCastTypes;
 
 class Branch extends Model
 {
-    use HasBilingualName;
+    use HasBilingualName, AutoCastTypes;
 
     protected $fillable = ['name', 'name_ar', 'name_en', 'address', 'phone', 'account_id', 'account_code'];
 

@@ -587,8 +587,7 @@ class PosController extends Controller
 
                 foreach ($request->items as $item) {
                     // 3. Check Stock Availability
-                    $branchProduct = \Illuminate\Support\Facades\DB::table('branch_products')
-                        ->where('branch_id', $order->branch_id)
+                    $branchProduct = \App\Models\BranchProduct::where('branch_id', $order->branch_id)
                         ->where('product_id', $item['product_id'])
                         ->first();
 
@@ -611,8 +610,7 @@ class PosController extends Controller
                     ]);
 
                     // 4. Deduct from branch inventory
-                    \Illuminate\Support\Facades\DB::table('branch_products')
-                        ->where('branch_id', $order->branch_id)
+                    \App\Models\BranchProduct::where('branch_id', $order->branch_id)
                         ->where('product_id', $item['product_id'])
                         ->decrement('stock_quantity', $item['quantity']);
                 }

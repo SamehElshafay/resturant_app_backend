@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AutoCastTypes;
 
 class RestaurantTable extends Model
 {
+    use AutoCastTypes;
     protected $fillable = ['zone_id', 'number', 'status', 'active_order_id'];
 
     protected $casts = [
