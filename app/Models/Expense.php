@@ -22,6 +22,11 @@ class Expense extends Model
 
     protected $casts = [
         'expense_date' => 'date',
+        'branch_id' => 'integer',
+        'account_id' => 'integer',
+        'source_account_id' => 'integer',
+        'created_by' => 'integer',
+        'amount' => 'decimal:2',
     ];
 
     public function branch()

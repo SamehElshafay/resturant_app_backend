@@ -15,6 +15,12 @@ class Ingredient extends Model
         'min_stock_level'
     ];
 
+    protected $casts = [
+        'cost_price' => 'decimal:2',
+        'stock_quantity' => 'decimal:3',
+        'min_stock_level' => 'decimal:3',
+    ];
+
     public function recipes()
     {
         return $this->hasMany(RecipeIngredient::class);

@@ -8,6 +8,10 @@ class Zone extends Model
 {
     protected $fillable = ['branch_id', 'name'];
 
+    protected $casts = [
+        'branch_id' => 'integer',
+    ];
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);

@@ -14,6 +14,14 @@ class OrderItem extends Model
         'item_total'
     ];
 
+    protected $casts = [
+        'order_id' => 'integer',
+        'product_id' => 'integer',
+        'quantity' => 'decimal:3',
+        'price' => 'decimal:2',
+        'item_total' => 'decimal:2',
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class);

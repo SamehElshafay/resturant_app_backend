@@ -11,6 +11,11 @@ class Product extends Model
 
     protected $fillable = ['category_id', 'name', 'name_ar', 'name_en', 'image', 'base_purchase_price'];
 
+    protected $casts = [
+        'category_id' => 'integer',
+        'base_purchase_price' => 'decimal:2',
+    ];
+
     protected $appends = ['image_url'];
 
     public function getImageUrlAttribute()

@@ -20,6 +20,10 @@ class Production extends Model
         'production_date' => 'date',
         'unit_cost' => 'decimal:2',
         'total_cost' => 'decimal:2',
+        'product_id' => 'integer',
+        'branch_id' => 'integer',
+        'performed_by' => 'integer',
+        'quantity_produced' => 'decimal:3',
     ];
 
     public function product()

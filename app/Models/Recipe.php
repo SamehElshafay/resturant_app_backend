@@ -8,6 +8,11 @@ class Recipe extends Model
 {
     protected $fillable = ['product_id', 'name_ar', 'name_en', 'cost', 'instructions'];
 
+    protected $casts = [
+        'product_id' => 'integer',
+        'cost' => 'decimal:2',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);

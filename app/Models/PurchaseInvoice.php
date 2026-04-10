@@ -23,6 +23,11 @@ class PurchaseInvoice extends Model
     protected $casts = [
         'invoice_date' => 'date',
         'approved_at' => 'datetime',
+        'supplier_id' => 'integer',
+        'branch_id' => 'integer',
+        'approved_by' => 'integer',
+        'total_amount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
     ];
 
     public function supplier()

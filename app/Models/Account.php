@@ -11,6 +11,12 @@ class Account extends Model
 
     protected $fillable = ['branch_id', 'parent_id', 'name', 'name_ar', 'name_en', 'code', 'type'];
 
+    protected $casts = [
+        'branch_id' => 'integer',
+        'parent_id' => 'integer',
+        'type' => 'integer',
+    ];
+
     protected static function boot()
     {
         parent::boot();

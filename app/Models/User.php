@@ -93,6 +93,14 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'branch_id' => 'integer',
+            'role_id' => 'integer',
+            'pos_id' => 'integer',
+            'account_id' => 'integer',
+            'salary' => 'decimal:2',
+            'reward_points' => 'integer',
+            'commission_rate' => 'decimal:2',
+            'is_active' => 'boolean',
         ];
     }
 }

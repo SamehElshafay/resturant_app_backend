@@ -16,4 +16,14 @@ class Ledger extends Model
         'credit',
         'description'
     ];
+
+    protected $casts = [
+        'branch_id' => 'integer',
+        'account_id' => 'integer',
+        'user_id' => 'integer',
+        'order_id' => 'integer',
+        'voucher_id' => 'integer',
+        'debit' => 'decimal:2',
+        'credit' => 'decimal:2',
+    ];
 }

@@ -11,6 +11,10 @@ class Branch extends Model
 
     protected $fillable = ['name', 'name_ar', 'name_en', 'address', 'phone', 'account_id', 'account_code'];
 
+    protected $casts = [
+        'account_id' => 'integer',
+    ];
+
     public function account()
     {
         return $this->belongsTo(Account::class, 'account_id');

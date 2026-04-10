@@ -24,6 +24,21 @@ class Order extends Model
         'notes'
     ];
 
+    protected $casts = [
+        'branch_id' => 'integer',
+        'cashier_id' => 'integer',
+        'driver_id' => 'integer',
+        'pos_id' => 'integer',
+        'table_id' => 'integer',
+        'daily_number' => 'integer',
+        'total_amount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'service_charge' => 'decimal:2',
+        'delivery_fee' => 'decimal:2',
+    ];
+
     public function cashier()
     {
         return $this->belongsTo(User::class, 'cashier_id');
