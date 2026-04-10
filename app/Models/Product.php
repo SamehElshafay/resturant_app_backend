@@ -12,6 +12,7 @@ class Product extends Model
     protected $fillable = ['category_id', 'name', 'name_ar', 'name_en', 'image', 'base_purchase_price'];
 
     protected $casts = [
+        'id' => 'integer',
         'category_id' => 'integer',
         'base_purchase_price' => 'decimal:2',
     ];
@@ -20,8 +21,10 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
-        if (!$this->image) return null;
-        if (filter_var($this->image, FILTER_VALIDATE_URL)) return $this->image;
+        if (!$this->image)
+            return null;
+        if (filter_var($this->image, FILTER_VALIDATE_URL))
+            return $this->image;
         return asset('storage/' . $this->image);
     }
 

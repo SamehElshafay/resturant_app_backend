@@ -17,6 +17,7 @@ class Production extends Model
     ];
 
     protected $casts = [
+        'id' => 'integer',
         'production_date' => 'date',
         'unit_cost' => 'decimal:2',
         'total_cost' => 'decimal:2',

@@ -9,6 +9,7 @@ class BranchProduct extends Model
     protected $fillable = ['branch_id', 'product_id', 'price', 'stock_quantity'];
 
     protected $casts = [
+        'id' => 'integer',
         'branch_id' => 'integer',
         'product_id' => 'integer',
         'price' => 'decimal:2',

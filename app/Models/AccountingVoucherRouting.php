@@ -11,4 +11,8 @@ class AccountingVoucherRouting extends Model
         'voucher_type',
         'parent_account_code',
     ];
+
+    protected $casts = [
+        'id' => 'integer',
+    ];
 }

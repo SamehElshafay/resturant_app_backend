@@ -7,4 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class AccountingEntityType extends Model
 {
     protected $fillable = ['name', 'display_name'];
+
+    protected $casts = [
+        'id' => 'integer',
+    ];
 }

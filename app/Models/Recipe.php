@@ -9,6 +9,7 @@ class Recipe extends Model
     protected $fillable = ['product_id', 'name_ar', 'name_en', 'cost', 'instructions'];
 
     protected $casts = [
+        'id' => 'integer',
         'product_id' => 'integer',
         'cost' => 'decimal:2',
     ];

@@ -8,6 +8,10 @@ class Role extends Model
 {
     protected $fillable = ['name', 'display_name', 'description', 'guard_name'];
 
+    protected $casts = [
+        'id' => 'integer',
+    ];
+
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'role_permission');

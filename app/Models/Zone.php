@@ -9,6 +9,7 @@ class Zone extends Model
     protected $fillable = ['branch_id', 'name'];
 
     protected $casts = [
+        'id' => 'integer',
         'branch_id' => 'integer',
     ];
 

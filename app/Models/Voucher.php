@@ -33,6 +33,7 @@ class Voucher extends Model
     ];
 
     protected $casts = [
+        'id' => 'integer',
         'amount' => 'decimal:2',
         'cash_amount' => 'decimal:2',
         'bank_amount' => 'decimal:2',

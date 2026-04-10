@@ -21,6 +21,7 @@ class Expense extends Model
     ];
 
     protected $casts = [
+        'id' => 'integer',
         'expense_date' => 'date',
         'branch_id' => 'integer',
         'account_id' => 'integer',

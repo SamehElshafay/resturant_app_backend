@@ -19,6 +19,7 @@ class JournalEntry extends Model
     ];
 
     protected $casts = [
+        'id' => 'integer',
         'payload' => 'array',
         'debit' => 'decimal:2',
         'credit' => 'decimal:2',

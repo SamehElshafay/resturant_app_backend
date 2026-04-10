@@ -9,6 +9,7 @@ class RestaurantTable extends Model
     protected $fillable = ['zone_id', 'number', 'status', 'active_order_id'];
 
     protected $casts = [
+        'id' => 'integer',
         'zone_id' => 'integer',
         'active_order_id' => 'integer',
         'number' => 'integer',

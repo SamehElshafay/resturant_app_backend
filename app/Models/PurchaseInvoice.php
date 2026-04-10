@@ -21,6 +21,7 @@ class PurchaseInvoice extends Model
     ];
 
     protected $casts = [
+        'id' => 'integer',
         'invoice_date' => 'date',
         'approved_at' => 'datetime',
         'supplier_id' => 'integer',

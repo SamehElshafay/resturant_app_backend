@@ -9,6 +9,7 @@ class PurchaseInvoiceItem extends Model
     protected $fillable = ['purchase_invoice_id', 'ingredient_id', 'quantity', 'remaining_quantity', 'unit_price', 'total_price'];
 
     protected $casts = [
+        'id' => 'integer',
         'purchase_invoice_id' => 'integer',
         'ingredient_id' => 'integer',
         'quantity' => 'decimal:3',

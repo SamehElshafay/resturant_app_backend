@@ -9,7 +9,19 @@ class Category extends Model
 {
     use HasBilingualName;
 
-    protected $fillable = ['name', 'name_ar', 'name_en', 'image', 'printer_ip', 'printer_connection_type'];
+    protected $fillable = [
+        'name',
+        'name_ar',
+        'name_en',
+        'image',
+        'printer_ip',
+        'printer_connection_type'
+    ];
+
+    protected $casts = [
+        'id' => 'integer',
+    ];
+
 
     public function products()
     {

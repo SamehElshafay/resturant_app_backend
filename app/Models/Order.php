@@ -25,6 +25,7 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'id' => 'integer',
         'branch_id' => 'integer',
         'cashier_id' => 'integer',
         'driver_id' => 'integer',

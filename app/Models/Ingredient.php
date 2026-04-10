@@ -16,6 +16,7 @@ class Ingredient extends Model
     ];
 
     protected $casts = [
+        'id' => 'integer',
         'cost_price' => 'decimal:2',
         'stock_quantity' => 'decimal:3',
         'min_stock_level' => 'decimal:3',

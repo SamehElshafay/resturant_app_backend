@@ -12,6 +12,7 @@ class Branch extends Model
     protected $fillable = ['name', 'name_ar', 'name_en', 'address', 'phone', 'account_id', 'account_code'];
 
     protected $casts = [
+        'id' => 'integer',
         'account_id' => 'integer',
     ];
 

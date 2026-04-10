@@ -20,6 +20,14 @@ class AccountingScenarioStep extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'id' => 'integer',
+        'scenario_id' => 'integer',
+        'parent_id' => 'integer',
+        'priority' => 'integer',
+        'is_active' => 'boolean',
+    ];
+
     public function scenario()
     {
         return $this->belongsTo(AccountingScenario::class);
