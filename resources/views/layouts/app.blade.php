@@ -12,6 +12,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --bg-color: #f8fafc;
@@ -638,6 +639,23 @@
         </main>
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
         <script>
+            window.confirmDelete = function(formId, itemName = 'this item') {
+                Swal.fire({
+                    title: '{{ app()->getLocale() == "ar" ? "هل أنت متأكد؟" : "Are you sure?" }}',
+                    text: '{{ app()->getLocale() == "ar" ? "سيتم حذف" : "You are about to delete" }}: ' + itemName,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '{{ app()->getLocale() == "ar" ? "نعم، احذف!" : "Yes, delete it!" }}',
+                    cancelButtonText: '{{ app()->getLocale() == "ar" ? "إلغاء" : "Cancel" }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById(formId).submit();
+                    }
+                })
+            }
+
             window.showToast = function (message, type = 'success') {
                 const toastEl = document.getElementById('liveToast');
                 const toastMessage = document.getElementById('toastMessage');

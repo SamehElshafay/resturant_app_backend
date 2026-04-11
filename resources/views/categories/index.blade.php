@@ -46,11 +46,12 @@
                                         </button>
                                     </li>
                                     <li>
-                                        <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this category?')">
+                                        <button type="button" class="dropdown-item rounded-2 py-2 text-danger" 
+                                            onclick="confirmDelete('delete-form-{{ $category->id }}', '{{ $category->name }}')">
+                                            <i class="fa-solid fa-trash-can me-2"></i> Delete Category
+                                        </button>
+                                        <form id="delete-form-{{ $category->id }}" action="{{ route('categories.destroy', $category->id) }}" method="POST" class="d-none">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="dropdown-item rounded-2 py-2 text-danger">
-                                                <i class="fa-solid fa-trash-can me-2"></i> Delete Category
-                                            </button>
                                         </form>
                                     </li>
                                 </ul>
@@ -192,16 +193,14 @@
     .title-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 </style>
 
-<script>
-    // Ensure modals work correctly even with event bubbling
-    document.addEventListener('DOMContentLoaded', function() {
-        const actionModals = document.querySelectorAll('.action-modal');
-        actionModals.forEach(modal => {
-            modal.addEventListener('show.bs.modal', function (event) {
-                // This ensures that clicking a modal trigger doesn't bubble to the card's link
-                event.stopPropagation();
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const actionModals = document.querySelectorAll('.action-modal');
+            actionModals.forEach(modal => {
+                modal.addEventListener('show.bs.modal', function (event) {
+                    event.stopPropagation();
+                });
             });
         });
-    });
-</script>
+    </script>
 @endsection

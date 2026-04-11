@@ -118,8 +118,28 @@ class EmployeeController extends Controller
 
     public function destroy(\App\Models\User $employee)
     {
+        // 1. Check for orders (as cashier)
+        $hasOrders = \App\Models\Order::where('cashier_id', $employee->id)->exists();
+
+        // 2. Check for ledger entries
+        $hasLedgers = \App\Models\Ledger::where('user_id', $employee->id)->exists();
+
+        // 3. Check for expenses recorded
+        $hasExpenses = \App\Models\Expense::where('created_by', $employee->id)->exists();
+
+        // 4. Check for productions performed
+        $hasProductions = \App\Models\Production::where('performed_by', $employee->id)->exists();
+
+        if ($hasOrders || $hasLedgers || $hasExpenses || $hasProductions) {
+            $errorMsg = app()->getLocale() == 'ar' 
+                ? 'لا يمكن حذف الموظف لوجود سجلات عمليات مرتبطة به (طلبات، قيود محاسبية، أو مصاريف). يمكنك تعطيل الحساب بدلاً من الحذف.' 
+                : 'Cannot delete employee because there are associated operation records (orders, ledgers, or expenses). You can deactivate the account instead.';
+            
+            return redirect()->back()->with('error', $errorMsg);
+        }
+
         $employee->delete();
-        return redirect()->back()->with('success', 'Employee deleted successfully');
+        return redirect()->back()->with('success', app()->getLocale() == 'ar' ? 'تم حذف الموظف بنجاح' : 'Employee deleted successfully');
     }
 
     public function generatePin()

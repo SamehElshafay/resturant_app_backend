@@ -97,7 +97,21 @@ class DriverController extends Controller
 
     public function destroy(User $driver)
     {
+        // Check if driver has associated orders
+        $hasOrders = \App\Models\Order::where('driver_id', $driver->id)->exists();
+        
+        // Check if driver has ledger entries
+        $hasLedgers = \App\Models\Ledger::where('user_id', $driver->id)->exists();
+
+        if ($hasOrders || $hasLedgers) {
+            $errorMsg = app()->getLocale() == 'ar' 
+                ? 'لا يمكن حذف السائق لوجود عمليات مرتبطة به. يمكنك تعطيل الحساب بدلاً من الحذف.' 
+                : 'Cannot delete driver because there are associated operations. You can deactivate the account instead.';
+            
+            return redirect()->back()->with('error', $errorMsg);
+        }
+
         $driver->delete();
-        return redirect()->back()->with('success', 'Driver deleted successfully');
+        return redirect()->back()->with('success', app()->getLocale() == 'ar' ? 'تم حذف السائق بنجاح' : 'Driver deleted successfully');
     }
 }

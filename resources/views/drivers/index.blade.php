@@ -55,12 +55,12 @@
                                         data-bs-target="#editDriverModal{{ $driver->id }}">
                                         <i class="fa-solid fa-edit"></i>
                                     </button>
-                                    <form action="{{ route('drivers.destroy', $driver->id) }}" method="POST" class="d-inline">
+                                    <button type="button" class="btn btn-sm btn-light text-danger"
+                                        onclick="confirmDelete('delete-form-{{ $driver->id }}', '{{ $driver->name }}')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                    <form id="delete-form-{{ $driver->id }}" action="{{ route('drivers.destroy', $driver->id) }}" method="POST" class="d-none">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-light text-danger"
-                                            onclick="return confirm('Delete driver?')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
                                     </form>
                                 </td>
                             </tr>

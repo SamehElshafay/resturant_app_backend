@@ -60,12 +60,12 @@
                                         data-bs-target="#editEmployeeModal{{ $employee->id }}">
                                         <i class="fa-solid fa-edit"></i>
                                     </button>
-                                    <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" class="d-inline">
+                                    <button type="button" class="btn btn-sm btn-light text-danger"
+                                        onclick="confirmDelete('delete-form-{{ $employee->id }}', '{{ $employee->name }}')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                    <form id="delete-form-{{ $employee->id }}" action="{{ route('employees.destroy', $employee->id) }}" method="POST" class="d-none">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-light text-danger"
-                                            onclick="return confirm('Delete employee?')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
                                     </form>
                                 </td>
                             </tr>
@@ -250,6 +250,7 @@
     </div>
 
     <script>
+
         document.getElementById('addEmployeeForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
