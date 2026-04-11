@@ -24,40 +24,54 @@ class ProductController extends Controller
     public function store(\Illuminate\Http\Request $request)
     {
         $request->validate([
-            'name' => 'required',
             'category_id' => 'required',
-            'base_purchase_price' => 'required|numeric',
             'image' => 'nullable|image',
-            'branch_prices' => 'nullable|array',
-            'branch_prices.*' => 'nullable|numeric',
+            'names' => 'required|array|min:1',
+            'names.*' => 'required|string',
+            'prices' => 'required|array|min:1',
+            'prices.*' => 'required|numeric',
         ]);
 
-        $data = $request->except(['image', 'branch_prices']);
-
+        $imagePath = null;
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $imagePath = $request->file('image')->store('products', 'public');
         }
 
-        $product = \App\Models\Product::create($data);
+        $createdCount = 0;
+        foreach ($request->names as $index => $name) {
+            $price = $request->prices[$index] ?? 0;
+            
+            $product = \App\Models\Product::create([
+                'name' => $name,
+                'category_id' => $request->category_id,
+                'base_purchase_price' => $price,
+                'image' => $imagePath,
+            ]);
 
-        // Save branch-specific prices
-        if ($request->has('branch_prices')) {
-            foreach ($request->branch_prices as $branchId => $price) {
-                if ($price !== null && $price > 0) {
-                    \App\Models\BranchProduct::create([
-                        'product_id' => $product->id,
-                        'branch_id' => $branchId,
-                        'price' => $price
-                    ]);
+            // If branch prices were provided (legacy or global), we apply them to each variation
+            if ($request->has('branch_prices')) {
+                foreach ($request->branch_prices as $branchId => $bPrice) {
+                    if ($bPrice !== null && $bPrice > 0) {
+                        \App\Models\BranchProduct::create([
+                            'product_id' => $product->id,
+                            'branch_id' => $branchId,
+                            'price' => $bPrice
+                        ]);
+                    }
                 }
             }
+            $createdCount++;
         }
+
+        $msg = app()->getLocale() == 'ar' 
+            ? "تم إضافة {$createdCount} منتجات بنجاح" 
+            : "Successfully added {$createdCount} products";
 
         if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => __('messages.product_added_success')]);
+            return response()->json(['success' => true, 'message' => $msg]);
         }
 
-        return redirect()->back()->with('success', __('messages.product_added_success'));
+        return redirect()->back()->with('success', $msg);
     }
 
     public function update(\Illuminate\Http\Request $request, \App\Models\Product $product)
