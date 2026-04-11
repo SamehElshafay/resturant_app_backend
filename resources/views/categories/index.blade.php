@@ -23,17 +23,26 @@
                 @foreach($categories as $category)
                     <div class="col-md-3">
                         <div class="card border h-100 position-relative">
-                            <div class="dropdown position-absolute top-0 end-0 p-2">
-                                <button class="btn btn-sm btn-light rounded-circle" data-bs-toggle="dropdown">
+                             <div class="dropdown position-absolute top-0 end-0 p-2" style="z-index: 10;">
+                                <button class="btn btn-sm btn-light rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-solid fa-ellipsis-vertical"></i>
                                 </button>
-                                <ul class="dropdown-menu shadow">
-                                    <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editCategoryModal{{ $category->id }}">Edit</button></li>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                                     <li>
-                                        <form action="{{ route('categories.destroy', $category->id) }}" method="POST">
+                                        <button type="button" class="dropdown-item py-2" 
+                                            onclick="event.stopPropagation();"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editCategoryModal{{ $category->id }}">
+                                            <i class="fa-solid fa-pen-to-square me-2 text-primary"></i> Edit Category
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure?')">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="dropdown-item text-danger"
-                                                onclick="return confirm('Are you sure?')">Delete</button>
+                                            <button type="submit" class="dropdown-item py-2 text-danger" onclick="event.stopPropagation();">
+                                                <i class="fa-solid fa-trash me-2"></i> Delete Category
+                                            </button>
                                         </form>
                                     </li>
                                 </ul>
