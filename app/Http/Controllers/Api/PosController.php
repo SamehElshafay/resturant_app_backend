@@ -62,6 +62,8 @@ class PosController extends Controller
                     $cat->printer_ip = $branchPrinter->printer_ip;
                     $cat->printer_connection_type = $branchPrinter->printer_connection_type;
                 }
+                // Safety cast for Flutter
+                $cat->id = (int) $cat->id;
                 return $cat;
             });
 
@@ -134,6 +136,11 @@ class PosController extends Controller
                 $product->printer_ip = $branchPrinter ? $branchPrinter->printer_ip : $product->category->printer_ip ?? null;
                 $product->printer_connection_type = $branchPrinter ? $branchPrinter->printer_connection_type : $product->category->printer_connection_type ?? 'network';
                 
+                // Safety cast for Flutter
+                $product->id = (int) $product->id;
+                $product->category_id = (int) $product->category_id;
+                $product->branch_price = (float) $product->branch_price;
+                
                 return $product;
             });
 
@@ -197,9 +204,13 @@ class PosController extends Controller
 
                 // Also inject into each product for easier access in frontend
                 foreach($cat->products as $product) {
+                    $product->id = (int) $product->id;
+                    $product->category_id = (int) $product->category_id;
                     $product->printer_ip = $ip;
                     $product->printer_connection_type = $type;
+                    $product->branch_price = (float) $product->branch_price;
                 }
+                $cat->id = (int) $cat->id;
 
                 return $cat;
             });
@@ -396,10 +407,10 @@ class PosController extends Controller
         return response()->json([
             'success' => true,
             'user' => [
-                'id' => $user->id,
+                'id' => (int) $user->id,
                 'name' => $user->name,
                 'role' => $user->role,
-                'branch_id' => $user->branch_id,
+                'branch_id' => (int) $user->branch_id,
                 'pos_account_code' => $user->pos_account_code,
                 'token' => $user->createToken('pos-device')->plainTextToken,
             ],
@@ -515,10 +526,10 @@ class PosController extends Controller
             'success' => true,
             'message' => app()->getLocale() == 'ar' ? 'تم تسجيل الجهاز بنجاح' : 'Device registered successfully',
             'device' => [
-                'id' => $device->id,
+                'id' => (int) $device->id,
                 'name' => $device->name,
-                'account_code' => $device->account_code, // Add account_code to response
-                'branch_id' => $device->branch_id,
+                'account_code' => $device->account_code,
+                'branch_id' => (int) $device->branch_id,
                 'branch_name' => $device->branch->name ?? 'Unknown Branch',
             ]
         ]);
@@ -990,13 +1001,19 @@ class PosController extends Controller
                     $product->printer_ip = $branchPrinter ? $branchPrinter->printer_ip : $product->category->printer_ip ?? null;
                     $product->printer_connection_type = $branchPrinter ? $branchPrinter->printer_connection_type : $product->category->printer_connection_type ?? 'network';
                     
+                    // Explicit casting for POS App sanity
+                    $product->id = (int) $product->id;
+                    $product->category_id = (int) $product->category_id;
+                    $product->branch_price = (float) $product->branch_price;
+                    $product->stock_quantity = (float) $product->stock_quantity;
+                    
                     return $product;
                 });
 
             return response()->json([
                 'status' => true,
                 'message' => 'Success',
-                'branch_id' => $branchId,
+                'branch_id' => (int) $branchId,
                 'inventory' => $inventory
             ]);
 
