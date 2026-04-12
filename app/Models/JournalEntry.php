@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AutoCastTypes;
 
 class JournalEntry extends Model
 {
+    use AutoCastTypes;
     protected $fillable = [
         'transaction_group_id',
         'debit_account_code',
@@ -20,6 +22,8 @@ class JournalEntry extends Model
 
     protected $casts = [
         'id' => 'integer',
+        'transaction_group_id' => 'integer',
+        'reference_id' => 'integer',
         'payload' => 'array',
         'debit' => 'decimal:2',
         'credit' => 'decimal:2',

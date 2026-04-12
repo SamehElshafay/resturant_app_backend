@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\AutoCastTypes;
 
 class Voucher extends Model
 {
+    use AutoCastTypes;
     protected $fillable = [
         'voucher_type',
         'expense_id',
@@ -34,6 +36,10 @@ class Voucher extends Model
 
     protected $casts = [
         'id' => 'integer',
+        'expense_id' => 'integer',
+        'voucher_expense_type_id' => 'integer',
+        'created_by' => 'integer',
+        'posted_by' => 'integer',
         'amount' => 'decimal:2',
         'cash_amount' => 'decimal:2',
         'bank_amount' => 'decimal:2',

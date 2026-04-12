@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AutoCastTypes;
 
 class Role extends Model
 {
+    use AutoCastTypes;
     protected $fillable = ['name', 'display_name', 'description', 'guard_name'];
 
     protected $casts = [

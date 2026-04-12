@@ -64,8 +64,7 @@ class ProductionController extends Controller
         $term = $request->q;
         $products = Product::where(function($q) use ($term) {
             $q->where('name_ar', 'LIKE', "%{$term}%")
-              ->orWhere('name_en', 'LIKE', "%{$term}%")
-              ->orWhere('sku', 'LIKE', "%{$term}%");
+              ->orWhere('name_en', 'LIKE', "%{$term}%");
         })
         ->whereHas('recipe') // Only items that can actually be produced
         ->limit(15)
