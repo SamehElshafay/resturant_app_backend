@@ -139,4 +139,29 @@ class ProductController extends Controller
             'ingredients' => $ingredients
         ]);
     }
+
+    public function bulkUpdatePrices(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'updates' => 'required|array',
+            'updates.*' => 'array',
+        ]);
+
+        foreach ($request->updates as $productId => $branchPrices) {
+            foreach ($branchPrices as $branchId => $price) {
+                if ($price === null || $price === '') {
+                    \App\Models\BranchProduct::where('product_id', $productId)
+                        ->where('branch_id', $branchId)
+                        ->delete();
+                } else {
+                    \App\Models\BranchProduct::updateOrCreate(
+                        ['product_id' => $productId, 'branch_id' => $branchId],
+                        ['price' => $price]
+                    );
+                }
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Bulk prices updated successfully']);
+    }
 }
