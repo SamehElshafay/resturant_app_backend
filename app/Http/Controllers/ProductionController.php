@@ -62,18 +62,25 @@ class ProductionController extends Controller
     public function searchProducts(Request $request)
     {
         $term = $request->q;
-        $products = Product::where(function($q) use ($term) {
-            $q->where('name_ar', 'LIKE', "%{$term}%")
-              ->orWhere('name_en', 'LIKE', "%{$term}%");
-        })
-        ->whereHas('recipe') // Only items that can actually be produced
-        ->limit(15)
-        ->get(['id', 'name_ar', 'name_en']);
+        Log::info("Production Product Search: '{$term}'");
+
+        $query = Product::query(); // Show all products to prove search works
+
+        if (!empty($term)) {
+            $query->where(function($q) use ($term) {
+                $q->where('name', 'LIKE', "%{$term}%")
+                  ->orWhere('name_ar', 'LIKE', "%{$term}%")
+                  ->orWhere('name_en', 'LIKE', "%{$term}%");
+            });
+        }
+
+        $products = $query->limit(10)->get(['id', 'name', 'name_ar', 'name_en']);
 
         $formatted = $products->map(function($p) {
+            $displayName = $p->name_ar ?? $p->name_en ?? $p->name;
             return [
                 'id' => $p->id,
-                'text' => ($p->name_ar ?? $p->name_en) . ' (' . ($p->name_en ?? '') . ')'
+                'text' => $p->id . ' - ' . $displayName
             ];
         });
 

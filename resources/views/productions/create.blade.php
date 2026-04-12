@@ -248,7 +248,7 @@
                 theme: "bootstrap-5",
                 width: '100%',
                 ajax: {
-                    url: "{{ route('productions.search-products') }}",
+                    url: "{{ route('productions.search-products') }}?v=" + Date.now(),
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {
@@ -259,7 +259,12 @@
                     },
                     cache: true
                 },
-                minimumInputLength: 1
+                language: {
+                    searching: function() { return "Searching..."; },
+                    noResults: function() { return "No products found"; }
+                },
+                minimumInputLength: 0,
+                dropdownParent: $('body')
             });
         }
 
