@@ -53,10 +53,32 @@ class ProductionController extends Controller
 
     public function create()
     {
-        // Get all products so user can see them, but validation will stop them if no recipe exists
-        $products = Product::with('recipe')->orderBy('name_en')->get();
+        // NO LONGER loading all products here for performance
         $branches = \App\Models\Branch::all();
-        return view('productions.create', compact('products', 'branches'));
+        return view('productions.create', compact('branches'));
+    }
+
+    // Ajax search for products with recipes
+    public function searchProducts(Request $request)
+    {
+        $term = $request->q;
+        $products = Product::where(function($q) use ($term) {
+            $q->where('name_ar', 'LIKE', "%{$term}%")
+              ->orWhere('name_en', 'LIKE', "%{$term}%")
+              ->orWhere('sku', 'LIKE', "%{$term}%");
+        })
+        ->whereHas('recipe') // Only items that can actually be produced
+        ->limit(15)
+        ->get(['id', 'name_ar', 'name_en']);
+
+        $formatted = $products->map(function($p) {
+            return [
+                'id' => $p->id,
+                'text' => ($p->name_ar ?? $p->name_en) . ' (' . ($p->name_en ?? '') . ')'
+            ];
+        });
+
+        return response()->json($formatted);
     }
 
     // Ajax helper to calculate estimated cost and ingredient usage for multiple items

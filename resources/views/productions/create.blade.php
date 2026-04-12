@@ -61,12 +61,7 @@
                                 <div class="bg-light p-3 rounded-4 border d-flex align-items-center gap-3">
                                     <div class="flex-grow-1">
                                         <select name="items[0][product_id]" class="form-select border-0 bg-transparent fw-bold product-select" required>
-                                            <option value="">Select Item to Produce...</option>
-                                            @foreach($products as $product)
-                                                <option value="{{ $product->id }}">
-                                                    {{ $product->name_ar ?? $product->name_en ?? $product->name }}
-                                                </option>
-                                            @endforeach
+                                            <option value="">Search to add...</option>
                                         </select>
                                     </div>
                                     <div class="vr mx-2 opacity-10"></div>
@@ -168,12 +163,7 @@
         <div class="bg-light p-3 rounded-4 border d-flex align-items-center gap-3">
             <div class="flex-grow-1">
                 <select name="items[REPLACE_INDEX][product_id]" class="form-select border-0 bg-transparent fw-bold product-select" required>
-                    <option value="">Select Item to Produce...</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}">
-                            {{ $product->name_ar ?? $product->name_en ?? $product->name }}
-                        </option>
-                    @endforeach
+                    <option value="">Search to add...</option>
                 </select>
             </div>
             <div class="vr mx-2 opacity-10"></div>
@@ -200,6 +190,35 @@
     .badge-soft-danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
     
     .sticky-bottom { position: sticky; bottom: 2rem; }
+
+    /* Select2 Professional Styling */
+    .select2-container--bootstrap-5 .select2-selection {
+        border: none !important;
+        background: transparent !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        min-height: 40px !important;
+        display: flex;
+        align-items: center;
+    }
+    .select2-dropdown {
+        border: none !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+        z-index: 1060;
+    }
+    .select2-results__option {
+        padding: 10px 15px !important;
+        font-size: 0.95rem;
+    }
+    .select2-results__option--highlighted {
+        background-color: #6366f1 !important;
+    }
+    .select2-search__field {
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+    }
 </style>
 
 <script>
@@ -217,13 +236,26 @@
         
         let rowIndex = 1;
 
-        // Initialize Select2 for a specific element
+        // Initialize Select2 for a specific element with Ajax
         function initSelect2(element) {
             $(element).select2({
                 placeholder: "Search for a product...",
                 allowClear: true,
-                theme: "bootstrap-5", // If you have bootstrap-5 theme, otherwise it uses default
-                width: '100%'
+                theme: "bootstrap-5",
+                width: '100%',
+                ajax: {
+                    url: "{{ route('productions.search-products') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { q: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1
             });
         }
 

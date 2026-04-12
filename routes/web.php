@@ -91,6 +91,7 @@ Route::middleware(['auth'])->group(function () {
     // Ingredients
     Route::resource('ingredients', App\Http\Controllers\IngredientController::class);
     Route::post('productions/calculate', [App\Http\Controllers\ProductionController::class, 'calculate'])->name('productions.calculate');
+    Route::get('productions/search-products', [App\Http\Controllers\ProductionController::class, 'searchProducts'])->name('productions.search-products');
     Route::resource('productions', App\Http\Controllers\ProductionController::class);
 
     // Purchase Invoices
