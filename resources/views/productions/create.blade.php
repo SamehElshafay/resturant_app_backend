@@ -58,25 +58,26 @@
                         <!-- Dynamic Items Area -->
                         <div id="itemsContainer" class="row g-3">
                             <div class="col-12 item-row animate__animated animate__fadeIn">
-                                <div class="bg-light p-3 rounded-4 border d-flex align-items-center gap-3">
+                                <div class="production-item-row p-2 ps-4 pe-2 rounded-4 d-flex align-items-center">
                                     <div class="flex-grow-1">
                                         <select name="items[0][product_id]" class="form-select border-0 bg-transparent fw-bold product-select" required>
                                             <option value="">Select Item to Produce...</option>
                                             @foreach($products as $product)
                                                 <option value="{{ $product->id }}">
                                                     {{ $product->name_ar ?? $product->name_en ?? $product->name }}
-                                                    {{ $product->recipe ? '' : '(No Recipe Defined)' }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="vr mx-2 opacity-10"></div>
-                                    <div style="width: 150px;">
-                                        <input type="number" name="items[0][quantity]" class="form-control border-0 bg-white shadow-sm rounded-3 py-2 text-center fw-bold quantity-input" step="0.01" min="0.01" placeholder="Qty">
+                                    <div class="vertical-divider"></div>
+                                    <div style="width: 120px;">
+                                        <input type="number" name="items[0][quantity]" class="form-control border-0 bg-light text-center fw-bold rounded-3 py-2 quantity-input" step="0.01" min="0.01" placeholder="0.00">
                                     </div>
-                                    <button type="button" class="btn btn-link text-danger p-2 remove-row-btn opacity-50 hover-opacity-100">
-                                        <i class="fa-solid fa-circle-minus fs-4"></i>
-                                    </button>
+                                    <div class="ms-3">
+                                        <button type="button" class="btn btn-remove-item remove-row-btn" title="Remove row">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -166,7 +167,7 @@
 <!-- Row Template -->
 <template id="itemRowTemplate">
     <div class="col-12 item-row animate__animated animate__fadeIn">
-        <div class="bg-light p-3 rounded-4 border d-flex align-items-center gap-3">
+        <div class="production-item-row p-2 ps-4 pe-2 rounded-4 d-flex align-items-center">
             <div class="flex-grow-1">
                 <select name="items[REPLACE_INDEX][product_id]" class="form-select border-0 bg-transparent fw-bold product-select" required>
                     <option value="">Select Item to Produce...</option>
@@ -177,13 +178,15 @@
                     @endforeach
                 </select>
             </div>
-            <div class="vr mx-2 opacity-10"></div>
-            <div style="width: 150px;">
-                <input type="number" name="items[REPLACE_INDEX][quantity]" class="form-control border-0 bg-white shadow-sm rounded-3 py-2 text-center fw-bold quantity-input" step="0.01" min="0.01" placeholder="Qty">
+            <div class="vertical-divider"></div>
+            <div style="width: 120px;">
+                <input type="number" name="items[REPLACE_INDEX][quantity]" class="form-control border-0 bg-light text-center fw-bold rounded-3 py-2 quantity-input" step="0.01" min="0.01" placeholder="0.00">
             </div>
-            <button type="button" class="btn btn-link text-danger p-2 remove-row-btn opacity-50 hover-opacity-100">
-                <i class="fa-solid fa-circle-minus fs-4"></i>
-            </button>
+            <div class="ms-3">
+                <button type="button" class="btn btn-remove-item remove-row-btn" title="Remove row">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -197,10 +200,65 @@
     .hover-opacity-100:hover { opacity: 1 !important; }
     
     .form-select, .form-control { box-shadow: none !important; }
-    .badge-soft-success { background: rgba(25, 135, 84, 0.1); color: #198754; }
-    .badge-soft-danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .badge-soft-success { background: rgba(34, 197, 94, 0.1); color: #198754; }
+    .badge-soft-danger { background: rgba(244, 63, 94, 0.1); color: #e11d48; }
     
     .sticky-bottom { position: sticky; bottom: 2rem; }
+
+    /* Polished Production Row */
+    .production-item-row {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+    .production-item-row:hover {
+        border-color: #6366f1;
+        transform: translateX(-5px); /* Soft highlight move for RTL */
+    }
+    [dir="ltr"] .production-item-row:hover {
+        transform: translateX(5px);
+    }
+
+    .vertical-divider {
+        width: 1px;
+        height: 40px;
+        background: #f1f5f9;
+        margin: 0 15px;
+    }
+
+    .btn-remove-item {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff1f2;
+        color: #f43f5e;
+        border: none;
+        transition: all 0.2s;
+        opacity: 0.6;
+    }
+    .btn-remove-item:hover {
+        opacity: 1;
+        background: #f43f5e;
+        color: white;
+        transform: rotate(90deg);
+    }
+
+    /* Select2 Polishing */
+    .select2-container--bootstrap-5 .select2-selection {
+        border: none !important;
+        background: transparent !important;
+        font-weight: 700 !important;
+        font-size: 1.05rem !important;
+        color: #1e293b !important;
+    }
+    .select2-container--bootstrap-5 .select2-selection__placeholder {
+        color: #94a3b8 !important;
+        font-weight: 500 !important;
+    }
 </style>
 
 <script>
