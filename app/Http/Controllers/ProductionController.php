@@ -59,249 +59,216 @@ class ProductionController extends Controller
         return view('productions.create', compact('products', 'branches'));
     }
 
-    // Ajax helper to calculate estimated cost and ingredient usage
+    // Ajax helper to calculate estimated cost and ingredient usage for multiple items
     public function calculate(Request $request)
     {
         $request->validate([
             'branch_id' => 'nullable|exists:branches,id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|numeric|min:0.01',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|numeric|min:0.01',
         ]);
 
-        $product = Product::with(['recipe.ingredients.ingredient', 'recipe.ingredients.childProduct'])->find($request->product_id);
-        $quantity = $request->quantity;
+        $aggregatedIngredients = [];
+        $totalProductionCost = 0;
+        $allProductsData = [];
 
-        if (!$product->recipe) {
-            return response()->json(['error' => 'Product has no recipe defined.'], 400);
-        }
+        foreach ($request->items as $item) {
+            $product = Product::with(['recipe.ingredients.ingredient', 'recipe.ingredients.childProduct'])->find($item['product_id']);
+            $quantity = $item['quantity'];
 
-        $ingredientsNeeded = [];
-        $totalCost = 0;
-        $maxPossibleQuantity = 999999999;
+            if (!$product->recipe) {
+                return response()->json(['error' => 'Product "' . ($product->name_en ?? $product->name) . '" has no recipe defined.'], 400);
+            }
 
-        foreach ($product->recipe->ingredients as $recipeItem) {
-            $requiredQty = $recipeItem->quantity * $quantity;
+            $productCost = 0;
 
-            $ingredientName = 'Unknown';
-            $stockQuantity = 0;
-            $unitCost = 0;
+            foreach ($product->recipe->ingredients as $recipeItem) {
+                $requiredQty = $recipeItem->quantity * $quantity;
+                $ingredientKey = '';
+                $ingredientName = 'Unknown';
+                $stockQuantity = 0;
+                $unitCost = 0;
 
-            if ($recipeItem->ingredient) {
-                $ing = $recipeItem->ingredient;
-                $ingredientName = $ing->name_ar ?? $ing->name_en ?? $ing->name;
-                $stockQuantity = $ing->stock_quantity;
-                $unitCost = $ing->cost_price;
-            } elseif ($recipeItem->childProduct) {
-                $child = $recipeItem->childProduct;
-                $ingredientName = $child->name_ar ?? $child->name_en ?? $child->name;
+                if ($recipeItem->ingredient) {
+                    $ing = $recipeItem->ingredient;
+                    $ingredientKey = 'ing_' . $ing->id;
+                    $ingredientName = $ing->name_ar ?? $ing->name_en ?? $ing->name;
+                    $stockQuantity = $ing->stock_quantity;
+                    $unitCost = $ing->cost_price;
+                } elseif ($recipeItem->childProduct) {
+                    $child = $recipeItem->childProduct;
+                    $ingredientKey = 'prod_' . $child->id;
+                    $ingredientName = $child->name_ar ?? $child->name_en ?? $child->name;
 
-                if ($request->branch_id) {
-                    $bp = \App\Models\BranchProduct::where('branch_id', $request->branch_id)
-                        ->where('product_id', $child->id)->first();
-                    $stockQuantity = $bp ? $bp->stock_quantity : 0;
-                } else {
-                    $stockQuantity = $child->stock_quantity ?? 0;
+                    if ($request->branch_id) {
+                        $bp = \App\Models\BranchProduct::where('branch_id', $request->branch_id)
+                            ->where('product_id', $child->id)->first();
+                        $stockQuantity = $bp ? $bp->stock_quantity : 0;
+                    } else {
+                        $stockQuantity = $child->stock_quantity ?? 0;
+                    }
+                    $unitCost = $child->base_purchase_price ?? 0;
                 }
-                $unitCost = $child->base_purchase_price ?? 0;
-            } else {
-                continue; // Skip invalid items
+
+                $lineCost = $requiredQty * $unitCost;
+                $totalProductionCost += $lineCost;
+                $productCost += $lineCost;
+
+                if (!isset($aggregatedIngredients[$ingredientKey])) {
+                    $aggregatedIngredients[$ingredientKey] = [
+                        'name' => $ingredientName,
+                        'required_qty' => 0,
+                        'unit' => $recipeItem->unit,
+                        'unit_cost' => $unitCost,
+                        'current_stock' => $stockQuantity,
+                    ];
+                }
+                $aggregatedIngredients[$ingredientKey]['required_qty'] += $requiredQty;
             }
 
-            // Calculate max possible production based on this item
-            $maxForItem = ($recipeItem->quantity > 0) ? ($stockQuantity / $recipeItem->quantity) : 999999999;
-            if ($maxForItem < $maxPossibleQuantity) {
-                $maxPossibleQuantity = $maxForItem;
-            }
-
-            $lineCost = $requiredQty * $unitCost;
-
-            $ingredientsNeeded[] = [
-                'name' => $ingredientName,
-                'required_qty' => $requiredQty,
-                'unit' => $recipeItem->unit,
-                'unit_cost' => $unitCost,
-                'line_cost' => $lineCost,
-                'current_stock' => $stockQuantity,
-                'sufficient_stock' => $stockQuantity >= $requiredQty
+            $allProductsData[] = [
+                'name' => $product->name_ar ?? $product->name_en ?? $product->name,
+                'quantity' => $quantity,
+                'cost' => $productCost
             ];
-
-            $totalCost += $lineCost;
         }
 
-        if ($maxPossibleQuantity == 999999999)
-            $maxPossibleQuantity = 0;
-        $maxPossibleQuantity = floor($maxPossibleQuantity * 100) / 100;
+        // Final status check for items
+        $finalIngredients = [];
+        foreach ($aggregatedIngredients as $key => $ing) {
+            $ing['line_cost'] = $ing['required_qty'] * $ing['unit_cost'];
+            $ing['sufficient_stock'] = $ing['current_stock'] >= $ing['required_qty'];
+            $finalIngredients[] = $ing;
+        }
 
         return response()->json([
-            'ingredients' => $ingredientsNeeded,
-            'total_cost' => $totalCost,
-            'unit_cost' => ($quantity > 0) ? ($totalCost / $quantity) : 0,
-            'max_possible_quantity' => $maxPossibleQuantity
+            'ingredients' => $finalIngredients,
+            'total_cost' => $totalProductionCost,
+            'products' => $allProductsData
         ]);
     }
-
 
     public function store(Request $request)
     {
         $request->validate([
             'branch_id' => 'required|exists:branches,id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|numeric|min:0.01',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|numeric|min:0.01',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $product = \App\Models\Product::with(['recipe.ingredients.ingredient', 'recipe.ingredients.childProduct'])->find($request->product_id);
-            $producedQty = $request->quantity;
-
-            if (!$product->recipe) {
-                return back()->with('error', 'Product has no recipe.');
-            }
-
-            $totalBatchCost = 0;
-
-            // 1. Deduct Ingredients & Calculate Actual Cost
-            foreach ($product->recipe->ingredients as $recipeItem) {
-                $requiredQty = $recipeItem->quantity * $producedQty;
-
-                if ($recipeItem->ingredient) {
-                    $ingredient = $recipeItem->ingredient;
-
-                    if ($ingredient->stock_quantity < $requiredQty) {
-                        throw new \Exception("Insufficient stock for ingredient: " . ($ingredient->name_ar ?? $ingredient->name_en ?? $ingredient->name));
-                    }
-
-                    $cost = $requiredQty * $ingredient->cost_price;
-                    $totalBatchCost += $cost;
-
-                    $ingredient->deductStock($requiredQty);
-
-                } elseif ($recipeItem->childProduct) {
-                    $child = $recipeItem->childProduct;
-
-                    // Check Branch Stock
-                    $bp = \App\Models\BranchProduct::where('branch_id', $request->branch_id)
-                        ->where('product_id', $child->id)->first();
-
-                    if (!$bp || $bp->stock_quantity < $requiredQty) {
-                        throw new \Exception("Insufficient stock for sub-product: " . ($child->name_ar ?? $child->name_en ?? $child->name) . " in selected branch.");
-                    }
-
-                    $bp->stock_quantity -= $requiredQty;
-                    $bp->save();
-
-                    // Calculate cost based on product base price
-                    $cost = $requiredQty * ($child->base_purchase_price ?? 0);
-                    $totalBatchCost += $cost;
-
-                    // Also decrement central stock to keep in sync (optional but recommended)
-                    $child->stock_quantity = ($child->stock_quantity ?? 0) - $requiredQty;
-                    $child->save();
-                }
-            }
-
-            $unitCost = ($producedQty > 0) ? ($totalBatchCost / $producedQty) : 0;
-
-            // 2. Add to Branch Stock (This is what Inventory View shows)
-            $branchProduct = \App\Models\BranchProduct::firstOrCreate(
-                ['branch_id' => $request->branch_id, 'product_id' => $product->id],
-                ['stock_quantity' => 0, 'price' => 0]
-            );
-
-            if (!($branchProduct->price > 0)) {
-                throw new \Exception(app()->getLocale() == 'ar' 
-                    ? "فشل الإنتاج: يجب تحديد سعر البيع للمنتج في هذا الفرع أولاً."
-                    : "Production Failed: Please set the product selling price in this branch first.");
-            }
-
-            $branchProduct->stock_quantity += $producedQty;
-            $branchProduct->save();
-
-            // 3. Update Product Central Stock & Base Purchase Price (Weighted Average)
-            // Calculate new average price based on existing central stock value + new batch value
-            // We use total system stock for the valuation baseline
-            $totalSystemStockBefore = $product->stock_quantity + ($product->branchPrices->sum('stock_quantity') - $producedQty);
-            $currentTotalValue = ($totalSystemStockBefore * ($product->base_purchase_price ?? 0));
-            $newTotalValue = $currentTotalValue + $totalBatchCost;
-
-            $totalSystemStockAfter = $totalSystemStockBefore + $producedQty;
-            $product->base_purchase_price = ($totalSystemStockAfter > 0) ? ($newTotalValue / $totalSystemStockAfter) : $unitCost;
-
-            // ONLY increment central stock if it's NOT for a specific branch (if branch_id logic allows)
-            // But here branch_id is required. If the system treats "No Branch" as Warehouse, we need to check that.
-            // Based on user feedback, producing for a branch should NOT increase "Store" (Central) stock.
-            // If the user wants to produce INTO the warehouse, they would select a specific "Warehouse" branch if it exists,
-            // or we could have a null branch_id. But currently branch_id is required.
-            // Let's assume as per user's current flow: Production to Branch = -Ingredients from Store, +Product in Branch. Store Product += 0.
-
-            $product->save();
-
-            // 4. Record Production Log with Branch
-            $production = Production::create([
-                'branch_id' => $request->branch_id,
-                'product_id' => $product->id,
-                'quantity_produced' => $producedQty,
-                'unit_cost' => $unitCost,
-                'total_cost' => $totalBatchCost,
-                'production_date' => now(),
-                'performed_by' => auth()->id() ?? 1,
-            ]);
-
-            // 5. Trigger Accounting Scenarios
-            // Get Configs
-            $rawAccCode = \App\Models\AccountingEntityConfig::where('entity_type', 'PRODUCTION_RAW_MATERIALS')->value('parent_account_code');
-            if (!$rawAccCode) {
-                 $rawAccCode = \App\Models\AccountingEntityConfig::where('entity_type', 'MERCHANT_BILL_DEBIT')->value('parent_account_code');
-            }
-            $rawAcc = \App\Models\Account::where('code', $rawAccCode)->first();
-            
+            $branch = \App\Models\Branch::with('account')->findOrFail($request->branch_id);
+            $rawAccCode = \App\Models\AccountingEntityConfig::where('entity_type', 'PRODUCTION_RAW_MATERIALS')->value('parent_account_code')
+                ?? \App\Models\AccountingEntityConfig::where('entity_type', 'MERCHANT_BILL_DEBIT')->value('parent_account_code');
             $profitAcc = \App\Models\AccountingEntityConfig::where('entity_type', 'PRODUCTION_PROFIT_ACCOUNT')->value('parent_account_code');
             $templateCode = \App\Models\AccountingEntityConfig::where('entity_type', 'PRODUCTION_FINISHED_GOODS')->value('parent_account_code');
-            
-            $branch = \App\Models\Branch::with('account')->find($request->branch_id);
             $branchCode = $branch->account->code ?? '000';
 
-            // Create/Find Branch Products Account (Tag logic equivalent)
-            // Code: BranchCode-TemplateCode
-            $targetCode = $branchCode . '-' . $templateCode;
-            $targetNameAr = ($rawAcc->name_ar ?? 'مواد خام') . ' - ' . ($branch->name_ar ?? $branch->name);
-            $targetNameEn = ($rawAcc->name_en ?? 'Raw Materials') . ' - ' . ($branch->name_en ?? $branch->name);
-            
-            $branchProductsAccount = \App\Models\Account::firstOrCreate(
-                ['code' => $targetCode],
-                [
-                    'name_ar' => $targetNameAr,
-                    'name_en' => $targetNameEn,
-                    'name' => $targetNameEn,
-                    'type' => 1, // Asset
-                    'parent_id' => $branch->account_id,
-                    'branch_id' => $branch->id
-                ]
-            );
+            foreach ($request->items as $itemData) {
+                $product = \App\Models\Product::with(['recipe.ingredients.ingredient', 'recipe.ingredients.childProduct'])->find($itemData['product_id']);
+                $producedQty = $itemData['quantity'];
+                
+                if (!$product->recipe) {
+                    throw new \Exception("Product " . ($product->name_en ?? $product->name) . " has no recipe.");
+                }
 
-            // Calculation based on Selling Price in branch
-            $sellingPrice = $branchProduct->price ?? 0;
-            $totalSellingAmount = $producedQty * $sellingPrice;
-            $totalProfit = $totalSellingAmount - $totalBatchCost;
+                $totalItemBatchCost = 0;
 
-            // Step A: Production (Raw -> Branch Products + Profit)
-            \App\Services\AccountingEngine::trigger('PRODUCTION_COMPLETE', [
-                'purchase_cost' => $totalBatchCost,
-                'selling_amount' => $totalSellingAmount,
-                'profit_amount' => $totalProfit,
-                'raw_materials_account' => $rawAccCode,
-                'branch_products_account' => $branchProductsAccount->code,
-                'profit_account' => $profitAcc,
-            ], [
-                'reference_type' => 'production',
-                'reference_id' => $production->id,
-                'description' => "Produced {$producedQty} of {$product->name_en} for branch {$branch->name}"
-            ]);
+                // 1. Deduct Ingredients
+                foreach ($product->recipe->ingredients as $recipeItem) {
+                    $requiredQty = $recipeItem->quantity * $producedQty;
+
+                    if ($recipeItem->ingredient) {
+                        $ingredient = $recipeItem->ingredient;
+                        if ($ingredient->stock_quantity < $requiredQty) {
+                            throw new \Exception("Insufficient stock for: " . ($ingredient->name_en ?? $ingredient->name));
+                        }
+                        $totalItemBatchCost += ($requiredQty * $ingredient->cost_price);
+                        $ingredient->deductStock($requiredQty);
+                    } elseif ($recipeItem->childProduct) {
+                        $child = $recipeItem->childProduct;
+                        $bp = \App\Models\BranchProduct::where('branch_id', $request->branch_id)->where('product_id', $child->id)->first();
+                        if (!$bp || $bp->stock_quantity < $requiredQty) {
+                            throw new \Exception("Insufficient stock for sub-product: " . ($child->name_en ?? $child->name) . " in selected branch.");
+                        }
+                        $bp->stock_quantity -= $requiredQty;
+                        $bp->save();
+                        $totalItemBatchCost += ($requiredQty * ($child->base_purchase_price ?? 0));
+                        $child->stock_quantity = ($child->stock_quantity ?? 0) - $requiredQty;
+                        $child->save();
+                    }
+                }
+
+                $unitCost = ($producedQty > 0) ? ($totalItemBatchCost / $producedQty) : 0;
+
+                // 2. Add to Branch Stock
+                $branchProduct = \App\Models\BranchProduct::firstOrCreate(
+                    ['branch_id' => $request->branch_id, 'product_id' => $product->id],
+                    ['stock_quantity' => 0, 'price' => 0]
+                );
+
+                if (!($branchProduct->price > 0)) {
+                    throw new \Exception("Selling price not set for " . ($product->name_en ?? $product->name) . " in branch " . $branch->name);
+                }
+
+                $branchProduct->stock_quantity += $producedQty;
+                $branchProduct->save();
+
+                // 3. Update Average Price & Log Production (Weighted Average)
+                $totalSystemStockBefore = $product->stock_quantity + ($product->branchPrices->sum('stock_quantity') - $producedQty);
+                $currentTotalValue = ($totalSystemStockBefore * ($product->base_purchase_price ?? 0));
+                $newTotalValue = $currentTotalValue + $totalItemBatchCost;
+                $totalSystemStockAfter = $totalSystemStockBefore + $producedQty;
+                
+                $product->base_purchase_price = ($totalSystemStockAfter > 0) ? ($newTotalValue / $totalSystemStockAfter) : $unitCost;
+                $product->save();
+
+                $production = Production::create([
+                    'branch_id' => $request->branch_id,
+                    'product_id' => $product->id,
+                    'quantity_produced' => $producedQty,
+                    'unit_cost' => $unitCost,
+                    'total_cost' => $totalItemBatchCost,
+                    'production_date' => now(),
+                    'performed_by' => auth()->id() ?? 1,
+                ]);
+
+                // 4. Accounting (Per Item)
+                $targetCode = $branchCode . '-' . $templateCode;
+                $branchProductsAccount = \App\Models\Account::firstOrCreate(
+                    ['code' => $targetCode],
+                    [
+                        'name_ar' => 'منتجات جاهزة - ' . $branch->name,
+                        'name_en' => 'Finished Goods - ' . $branch->name,
+                        'name' => 'Finished Goods - ' . $branch->name,
+                        'type' => 1, 'parent_id' => $branch->account_id, 'branch_id' => $branch->id
+                    ]
+                );
+
+                $sellingPrice = $branchProduct->price ?? 0;
+                $totalSellingAmount = $producedQty * $sellingPrice;
+                $totalProfit = $totalSellingAmount - $totalItemBatchCost;
+
+                \App\Services\AccountingEngine::trigger('PRODUCTION_COMPLETE', [
+                    'purchase_cost' => $totalItemBatchCost,
+                    'selling_amount' => $totalSellingAmount,
+                    'profit_amount' => $totalProfit,
+                    'raw_materials_account' => $rawAccCode,
+                    'branch_products_account' => $branchProductsAccount->code,
+                    'profit_account' => $profitAcc,
+                ], [
+                    'reference_type' => 'production',
+                    'reference_id' => $production->id,
+                    'description' => "Produced {$producedQty} of {$product->name_en}"
+                ]);
+            }
 
             DB::commit();
-
-            return redirect()->route('productions.index')->with('success', "Production recorded successfully. Added $producedQty {$product->name_en} to stock.");
+            return redirect()->route('productions.index')->with('success', "Production for multiple items recorded successfully.");
 
         } catch (\Exception $e) {
             DB::rollBack();
