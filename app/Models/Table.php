@@ -12,7 +12,7 @@ class Table extends Model
         'id' => 'integer',
         'zone_id' => 'integer',
         'active_order_id' => 'integer',
-        'number' => 'integer',
+        'number' => 'string',
     ];
 
     public function zone()

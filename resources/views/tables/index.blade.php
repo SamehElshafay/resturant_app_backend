@@ -129,11 +129,12 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>
-                                    <form action="{{ route('zones.destroy', $zone->id) }}" method="POST">
+                                    <form id="delete-zone-{{ $zone->id }}" action="{{ route('zones.destroy', $zone->id) }}" method="POST">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="dropdown-item text-danger"
-                                            onclick="return confirm('Delete zone?')"><i
-                                                class="fa-solid fa-trash me-2"></i>Delete</button>
+                                        <button type="button" class="dropdown-item text-danger"
+                                            onclick="confirmDelete('delete-zone-{{ $zone->id }}', '{{ $zone->name }}')">
+                                            <i class="fa-solid fa-trash me-2"></i>Delete
+                                        </button>
                                     </form>
                                 </li>
                             </ul>
@@ -161,11 +162,11 @@
                                                         data-bs-target="#editTableModal{{ $table->id }}">
                                                         <i class="fa-solid fa-pen-to-square"></i>
                                                     </button>
-                                                    <form action="{{ route('tables.destroy', $table->id) }}" method="POST"
+                                                    <form id="delete-table-{{ $table->id }}" action="{{ route('tables.destroy', $table->id) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-light p-1 text-danger"
-                                                            onclick="return confirm('Delete table?')">
+                                                        <button type="button" class="btn btn-sm btn-light p-1 text-danger"
+                                                            onclick="confirmDelete('delete-table-{{ $table->id }}', 'Table {{ $table->number }}')">
                                                             <i class="fa-solid fa-trash"></i>
                                                         </button>
                                                     </form>
@@ -365,4 +366,27 @@
             cursor: default;
         }
     </style>
+
+    <script>
+        function confirmDelete(formId, itemName) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete "${itemName}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6366f1',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                padding: '2rem',
+                customClass: {
+                    popup: 'rounded-4 border-0 shadow-lg'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        }
+    </script>
 @endsection
