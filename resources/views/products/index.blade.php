@@ -43,6 +43,7 @@
                     <div class="selection-overlay">
                         <input class="form-check-input product-checkbox" type="checkbox" value="{{ $product->id }}" 
                                data-name="{{ $product->name }}" 
+                               data-base-price="{{ number_format($product->base_purchase_price, 2) }}"
                                data-prices="{{ json_encode($product->branchPrices->pluck('price', 'branch_id')) }}">
                     </div>
 
@@ -219,7 +220,8 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light sticky-top">
                             <tr>
-                                <th class="ps-4" style="width: 250px;">Product</th>
+                                <th class="ps-4" style="width: 200px;">Product</th>
+                                <th class="text-center" style="width: 120px;">Base Price</th>
                                 @foreach($branches as $branch)
                                     <th class="text-center">{{ $branch->name }}</th>
                                 @endforeach
@@ -367,6 +369,9 @@
     }
     
     .sticky-top { top: 0; z-index: 1020; }
+    .bg-secondary-soft {
+        background: rgba(108, 117, 125, 0.1);
+    }
 </style>
 
 <script>
@@ -425,6 +430,7 @@
             selected.forEach(cb => {
                 const productId = cb.value;
                 const productName = cb.getAttribute('data-name');
+                const basePrice = cb.getAttribute('data-base-price');
                 const existingPrices = JSON.parse(cb.getAttribute('data-prices') || '{}');
                 
                 let rowHtml = `
@@ -432,6 +438,9 @@
                         <td class="ps-4">
                             <div class="fw-bold text-dark">${productName}</div>
                             <div class="text-secondary small">ID: #${productId}</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary-soft text-secondary fw-bold">$ ${basePrice}</span>
                         </td>`;
                 
                 branches.forEach(branch => {
