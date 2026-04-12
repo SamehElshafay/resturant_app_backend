@@ -51,11 +51,25 @@ class ProductionController extends Controller
         return view('productions.show', compact('production'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        // NO LONGER loading all products here for performance
         $branches = \App\Models\Branch::all();
-        return view('productions.create', compact('branches'));
+        $preselectedProducts = [];
+
+        if ($request->has('products')) {
+            $ids = explode(',', $request->products);
+            $preselectedProducts = Product::whereIn('id', $ids)
+                ->whereHas('recipe')
+                ->get(['id', 'name', 'name_ar', 'name_en'])
+                ->map(function($p) {
+                    return [
+                        'id' => (int) $p->id,
+                        'text' => $p->id . ' - ' . ($p->name_ar ?? $p->name_en ?? $p->name)
+                    ];
+                });
+        }
+
+        return view('productions.create', compact('branches', 'preselectedProducts'));
     }
 
     // Ajax search for products with recipes

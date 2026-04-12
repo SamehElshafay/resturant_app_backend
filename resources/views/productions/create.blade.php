@@ -269,7 +269,26 @@
         }
 
         // Initialize existing rows
-        document.querySelectorAll('.product-select').forEach(sel => initSelect2(sel));
+        const preselectedProducts = {!! json_encode($preselectedProducts) !!};
+        
+        if (preselectedProducts.length > 0) {
+            itemsContainer.innerHTML = '';
+            rowIndex = 0;
+            preselectedProducts.forEach(product => {
+                const newRowHtml = itemRowTemplate.replace(/REPLACE_INDEX/g, rowIndex++);
+                itemsContainer.insertAdjacentHTML('beforeend', newRowHtml);
+                const lastRow = itemsContainer.lastElementChild;
+                const selectElement = lastRow.querySelector('.product-select');
+                
+                initSelect2(selectElement);
+                
+                // Set the value for Select2 Ajax
+                const option = new Option(product.text, product.id, true, true);
+                $(selectElement).append(option).trigger('change');
+            });
+        } else {
+            document.querySelectorAll('.product-select').forEach(sel => initSelect2(sel));
+        }
 
         addRowBtn.addEventListener('click', () => {
             const newRowHtml = itemRowTemplate.replace(/REPLACE_INDEX/g, rowIndex++);

@@ -208,8 +208,11 @@
             <button class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm" id="openRecipeSyncModal">
                 <i class="fa-solid fa-copy me-2"></i> Sync Recipes
             </button>
-            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow" id="openBulkEditModal">
+            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" id="openBulkEditModal">
                 <i class="fa-solid fa-tags me-2"></i> Bulk Edit Prices
+            </button>
+            <button class="btn btn-info rounded-pill px-4 fw-bold shadow text-white" id="goToProduction">
+                <i class="fa-solid fa-industry me-2"></i> Send to Production
             </button>
         </div>
     </div>
@@ -431,8 +434,17 @@
         const selectedCountSpan = document.getElementById('selectedCount');
         const clearSelectionBtn = document.getElementById('clearSelection');
         const openBulkEditBtn = document.getElementById('openBulkEditModal');
+        const goToProductionBtn = document.getElementById('goToProduction');
         const bulkEditBody = document.getElementById('bulkEditTableBody');
         const branches = {!! json_encode($branches) !!};
+        
+        goToProductionBtn.addEventListener('click', function() {
+            const selected = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) return;
+            
+            const url = "{{ route('productions.create') }}?products=" + selected.join(',');
+            window.location.href = url;
+        });
 
         function updateUI() {
             const selected = document.querySelectorAll('.product-checkbox:checked');
