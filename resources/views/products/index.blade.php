@@ -84,6 +84,11 @@
                     </div>
                     
                     <div class="card-body p-4 text-center">
+                        @if($product->recipe)
+                            <span class="badge bg-warning-soft text-warning border-warning position-absolute top-0 start-0 m-3" style="font-size: 0.65rem;">
+                                <i class="fa-solid fa-utensils me-1"></i> Has Recipe
+                            </span>
+                        @endif
                         <h6 class="fw-bold text-dark mb-1">{{ $product->name }}</h6>
                         <p class="text-secondary small mb-3">{{ $product->category->name ?? 'No Category' }}</p>
                         
@@ -200,9 +205,53 @@
         </div>
         <div class="d-flex gap-3">
             <button class="btn btn-outline-light rounded-pill px-4" id="clearSelection">Clear Selection</button>
+            <button class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm" id="openRecipeSyncModal">
+                <i class="fa-solid fa-copy me-2"></i> Sync Recipes
+            </button>
             <button class="btn btn-primary rounded-pill px-4 fw-bold shadow" id="openBulkEditModal">
                 <i class="fa-solid fa-tags me-2"></i> Bulk Edit Prices
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Recipe Sync Modal -->
+<div class="modal fade" id="recipeSyncModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 bg-warning text-dark p-4">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-copy me-2"></i>Sync Recipes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-secondary small mb-4">Select a source product to copy its recipe (ingredients and quantities) to the <span id="syncTargetCount" class="fw-bold text-dark">0</span> selected products.</p>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-secondary">Source Product (with Recipe)</label>
+                    <select id="sourceProductSelect" class="form-select rounded-3 p-3 shadow-sm border-2 border-warning shadow-none">
+                        <option value="">-- Choose Product --</option>
+                        @foreach($products as $p)
+                            @if($p->recipe)
+                                <option value="{{ $p->id }}">{{ $p->name }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="alert alert-warning border-0 rounded-3 mb-0">
+                    <div class="d-flex">
+                        <i class="fa-solid fa-triangle-exclamation fs-4 me-3 mt-1"></i>
+                        <p class="small mb-0">Note: This will <strong>overwrite</strong> any existing recipes on the target products. This action cannot be undone.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmRecipeSync" class="btn btn-warning rounded-pill px-5 fw-bold shadow">
+                    <span class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
+                    Sync Recipes Now
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -369,9 +418,9 @@
     }
     
     .sticky-top { top: 0; z-index: 1020; }
-    .bg-secondary-soft {
-        background: rgba(108, 117, 125, 0.1);
-    }
+    .bg-info-soft { background: rgba(13, 202, 240, 0.1); }
+    .bg-warning-soft { background: rgba(255, 193, 7, 0.1); }
+    .bg-secondary-soft { background: rgba(108, 117, 125, 0.1); }
 </style>
 
 <script>
@@ -461,6 +510,60 @@
             });
             
             new bootstrap.Modal(document.getElementById('bulkEditModal')).show();
+        });
+
+        // Recipe Sync Handling
+        const openRecipeSyncBtn = document.getElementById('openRecipeSyncModal');
+        const confirmRecipeSyncBtn = document.getElementById('confirmRecipeSync');
+        const syncTargetCountSpan = document.getElementById('syncTargetCount');
+
+        openRecipeSyncBtn.addEventListener('click', function() {
+            const selectedCount = document.querySelectorAll('.product-checkbox:checked').length;
+            syncTargetCountSpan.innerText = selectedCount;
+            new bootstrap.Modal(document.getElementById('recipeSyncModal')).show();
+        });
+
+        confirmRecipeSyncBtn.addEventListener('click', async function() {
+            const sourceId = document.getElementById('sourceProductSelect').value;
+            if (!sourceId) {
+                window.showToast('Please select a source product', 'error');
+                return;
+            }
+
+            const targetIds = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => cb.value);
+            
+            const btn = this;
+            const spinner = btn.querySelector('.spinner-border');
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+
+            try {
+                const response = await fetch('{{ route('products.bulk-sync-recipes') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        source_product_id: sourceId,
+                        target_product_ids: targetIds
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    window.showToast(data.message, 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    window.showToast(data.message || 'Error syncing recipes', 'error');
+                }
+            } catch (e) {
+                window.showToast('Unexpected error occurred', 'error');
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+            }
         });
 
         document.getElementById('saveBulkUpdates').addEventListener('click', async function() {

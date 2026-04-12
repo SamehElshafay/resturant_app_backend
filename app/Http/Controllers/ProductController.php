@@ -10,7 +10,7 @@ class ProductController extends Controller
     {
         $categoryId = $request->get('category_id');
         
-        $products = \App\Models\Product::with('category', 'branchPrices.branch')
+        $products = \App\Models\Product::with('category', 'branchPrices.branch', 'recipe')
             ->when($categoryId, function ($q) use ($categoryId) {
                 return $q->where('category_id', $categoryId);
             })
@@ -163,5 +163,47 @@ class ProductController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Bulk prices updated successfully']);
+    }
+
+    public function bulkSyncRecipes(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'source_product_id' => 'required|exists:products,id',
+            'target_product_ids' => 'required|array',
+            'target_product_ids.*' => 'exists:products,id',
+        ]);
+
+        $sourceProduct = \App\Models\Product::with('recipe.ingredients')->findOrFail($request->source_product_id);
+        
+        if (!$sourceProduct->recipe) {
+            return response()->json(['success' => false, 'message' => 'Source product has no recipe'], 422);
+        }
+
+        foreach ($request->target_product_ids as $targetId) {
+            // Skip if target is same as source
+            if ($targetId == $request->source_product_id) continue;
+
+            $targetProduct = \App\Models\Product::findOrFail($targetId);
+            
+            // 1. Delete old recipe if exists
+            if ($targetProduct->recipe) {
+                $targetProduct->recipe->ingredients()->delete();
+                $targetProduct->recipe->delete();
+            }
+
+            // 2. Clone the recipe record
+            $newRecipe = $sourceProduct->recipe->replicate();
+            $newRecipe->product_id = $targetId;
+            $newRecipe->save();
+
+            // 3. Clone ingredients
+            foreach ($sourceProduct->recipe->ingredients as $ingredient) {
+                $newIngredient = $ingredient->replicate();
+                $newIngredient->recipe_id = $newRecipe->id;
+                $newIngredient->save();
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Recipe synced successfully to ' . count($request->target_product_ids) . ' products']);
     }
 }

@@ -59,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products.index');
     Route::post('/products/bulk-update-prices', [App\Http\Controllers\ProductController::class, 'bulkUpdatePrices'])->name('products.bulk-update-prices');
+    Route::post('/products/bulk-sync-recipes', [App\Http\Controllers\ProductController::class, 'bulkSyncRecipes'])->name('products.bulk-sync-recipes');
     Route::post('/products', [App\Http\Controllers\ProductController::class, 'store'])->name('products.store');
     Route::put('/products/{product}', [App\Http\Controllers\ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [App\Http\Controllers\ProductController::class, 'destroy'])->name('products.destroy');
