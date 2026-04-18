@@ -56,4 +56,31 @@ class IngredientController extends Controller
         $ingredient->delete();
         return back()->with('success', 'Ingredient deleted successfully');
     }
+
+    public function search(Request $request)
+    {
+        $term = $request->q;
+        $query = Ingredient::query();
+
+        if ($term) {
+            $query->where(function ($q) use ($term) {
+                $q->where('name_ar', 'LIKE', "%{$term}%")
+                    ->orWhere('name_en', 'LIKE', "%{$term}%")
+                    ->orWhere('id', 'LIKE', "%{$term}%");
+            });
+        }
+
+        $ingredients = $query->limit(10)->get();
+
+        $formatted = $ingredients->map(function ($i) {
+            return [
+                'id' => $i->id,
+                'text' => $i->id . ' - ' . ($i->name_ar ?? $i->name_en ?? $i->name),
+                'cost' => $i->cost_price ?? 0,
+                'unit' => $i->unit
+            ];
+        });
+
+        return response()->json($formatted);
+    }
 }

@@ -206,4 +206,32 @@ class ProductController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Recipe synced successfully to ' . count($request->target_product_ids) . ' products']);
     }
+
+    public function search(Request $request)
+    {
+        $term = $request->q;
+        $query = \App\Models\Product::query();
+
+        if ($term) {
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'LIKE', "%{$term}%")
+                    ->orWhere('name_ar', 'LIKE', "%{$term}%")
+                    ->orWhere('name_en', 'LIKE', "%{$term}%")
+                    ->orWhere('id', 'LIKE', "%{$term}%");
+            });
+        }
+
+        $products = $query->limit(10)->get();
+
+        $formatted = $products->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'text' => $p->id . ' - ' . ($p->name_ar ?? $p->name_en ?? $p->name),
+                'cost' => $p->base_purchase_price ?? 0,
+                'unit' => 'piece'
+            ];
+        });
+
+        return response()->json($formatted);
+    }
 }

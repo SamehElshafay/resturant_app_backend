@@ -11,18 +11,79 @@ use Illuminate\Support\Facades\DB;
 
 class RecipeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $recipes = Recipe::with('product')->get();
+        $query = Recipe::with(['product', 'ingredients']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'LIKE', "%{$search}%")
+                    ->orWhere('cost', 'LIKE', "%{$search}%")
+                    ->orWhere('name_ar', 'LIKE', "%{$search}%")
+                    ->orWhere('name_en', 'LIKE', "%{$search}%")
+                    ->orWhere('instructions', 'LIKE', "%{$search}%")
+                    ->orWhereHas('product', function ($pq) use ($search) {
+                        $pq->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('name_ar', 'LIKE', "%{$search}%")
+                            ->orWhere('name_en', 'LIKE', "%{$search}%")
+                            ->orWhere('id', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('ingredients.ingredient', function ($iq) use ($search) {
+                        $iq->where('name_ar', 'LIKE', "%{$search}%")
+                            ->orWhere('name_en', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('ingredients.childProduct', function ($pq) use ($search) {
+                        $pq->where('name_ar', 'LIKE', "%{$search}%")
+                            ->orWhere('name_en', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        // Specific Column Filters
+        if ($request->filled('product_name')) {
+            $name = $request->product_name;
+            $query->whereHas('product', function ($q) use ($name) {
+                $q->where('name_ar', 'LIKE', "%{$name}%")
+                    ->orWhere('name_en', 'LIKE', "%{$name}%")
+                    ->orWhere('name', 'LIKE', "%{$name}%");
+            });
+        }
+
+        if ($request->filled('min_cost')) {
+            $query->where('cost', '>=', $request->min_cost);
+        }
+        if ($request->filled('max_cost')) {
+            $query->where('cost', '<=', $request->max_cost);
+        }
+
+        if ($request->filled('min_stock')) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('stock_quantity', '>=', $request->min_stock);
+            });
+        }
+        if ($request->filled('max_stock')) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('stock_quantity', '<=', $request->max_stock);
+            });
+        }
+
+        if ($request->filled('min_ingredients')) {
+            $query->has('ingredients', '>=', $request->min_ingredients);
+        }
+        if ($request->filled('max_ingredients')) {
+            $query->has('ingredients', '<=', $request->max_ingredients);
+        }
+
+        $recipes = $query->latest()->paginate(10)->withQueryString();
         return view('recipes.index', compact('recipes'));
     }
 
     public function create()
     {
-        $products = Product::orderBy('name_en')->get();
-        $ingredients = Ingredient::orderBy('name_en')->get();
-        // Sub-products can be any product except likely the one being created (handled in validation or UI logic)
-        $subProducts = Product::orderBy('name_en')->get();
+        $products = Product::orderBy('name_en')->limit(10)->get();
+        $ingredients = Ingredient::orderBy('name_ar')->limit(10)->get();
+        $subProducts = Product::orderBy('name_en')->limit(10)->get();
 
         return view('recipes.create', compact('products', 'ingredients', 'subProducts'));
     }

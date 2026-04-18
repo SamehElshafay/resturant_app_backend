@@ -16,12 +16,12 @@
             @csrf
             <div class="mb-3">
                 <label class="form-label">Product</label>
-                <select name="product_id" class="form-select @error('product_id') is-invalid @enderror" required
+                <select name="product_id" class="form-select select2-ajax-product @error('product_id') is-invalid @enderror" required
                     style="color: #000;">
                     <option value="" class="text-muted">Select Finished Product...</option>
                     @foreach($products as $product)
-                        <option value="{{ $product->id }}" style="color: #000;">
-                            {{ $product->name_ar ?? $product->name_en ?? $product->name ?? 'Product #' . $product->id }}
+                        <option value="{{ $product->id }}">
+                            {{ $product->id }} - {{ $product->name_ar ?? $product->name_en ?? $product->name }}
                         </option>
                     @endforeach
                 </select>
@@ -43,26 +43,14 @@
                     </div>
                     <div class="col-md-4 component-wrapper">
                         {{-- Ingredient Select --}}
-                        <select name="ingredients[0][ingredient_id]" class="form-select item-select ingredient-select"
+                        <select name="ingredients[0][ingredient_id]" class="form-select item-select ingredient-select select2-ajax-ingredient"
                             required style="color: #000;">
                             <option value="" class="text-muted">Select Ingredient...</option>
-                            @foreach($ingredients as $ing)
-                                <option value="{{ $ing->id }}" data-cost="{{ $ing->cost_price }}" data-unit="{{ $ing->unit }}"
-                                    style="color: #000;">
-                                    {{ $ing->name_ar ?? $ing->name_en ?? $ing->name }}
-                                </option>
-                            @endforeach
                         </select>
                         {{-- Sub-Product Select (Hidden by Default) --}}
                         <select name="ingredients[0][child_product_id]"
-                            class="form-select item-select product-select d-none" disabled style="color: #000;">
+                            class="form-select item-select product-select select2-ajax-product d-none" disabled style="color: #000;">
                             <option value="" class="text-muted">Select Product...</option>
-                            @foreach($subProducts as $sub)
-                                <option value="{{ $sub->id }}" data-cost="{{ $sub->base_purchase_price ?? 0 }}"
-                                    data-unit="piece" style="color: #000;">
-                                    {{ $sub->name_ar ?? $sub->name_en ?? $sub->name }}
-                                </option>
-                            @endforeach
                         </select>
                         {{-- Recipe Preview --}}
                         <div class="component-preview mt-1 text-muted small fst-italic d-none ps-2 border-start border-3 border-info"></div>
@@ -98,121 +86,165 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        $(document).ready(function () {
             let i = 1;
+
+            function initSelect2(row = null) {
+                const scope = row ? $(row) : $(document);
+
+                // Initialize Product Selects
+                scope.find('.select2-ajax-product').select2({
+                    theme: 'bootstrap-5',
+                    ajax: {
+                        url: '{{ route("products.search") }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return { q: params.term };
+                        },
+                        processResults: function (data) {
+                            return { results: data };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 0
+                }).on('select2:select', function(e) {
+                    const data = e.params.data;
+                    const row = $(this).closest('.ingredient-row');
+                    if (row.length) {
+                        row.find('.cost-display').val(data.cost || 0);
+                        row.find('.unit-select').val(data.unit || 'piece');
+                        checkRecipeLink(row, data.id);
+                    }
+                });
+
+                // Initialize Ingredient Selects
+                scope.find('.select2-ajax-ingredient').select2({
+                    theme: 'bootstrap-5',
+                    ajax: {
+                        url: '{{ route("ingredients.search") }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return { q: params.term };
+                        },
+                        processResults: function (data) {
+                            return { results: data };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 0
+                }).on('select2:select', function(e) {
+                    const data = e.params.data;
+                    const row = $(this).closest('.ingredient-row');
+                    if (row.length) {
+                        row.find('.cost-display').val(data.cost || 0);
+                        if (data.unit) row.find('.unit-select').val(data.unit);
+                    }
+                });
+            }
+
+            function checkRecipeLink(row, productId) {
+                const previewContainer = row.find('.component-preview');
+                if (!previewContainer.length) return;
+
+                previewContainer.removeClass('d-none').html('<i class="fa fa-spinner fa-spin"></i> Checking components...');
+                
+                fetch("{{ url('products') }}/" + productId + "/recipe")
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.has_recipe && data.ingredients && data.ingredients.length > 0) {
+                            const items = data.ingredients.map(i => `${i.name} (${i.quantity}${i.unit})`).join(', ');
+                            previewContainer.html(`<i class="fa fa-info-circle me-1"></i> <span class="text-dark">Includes:</span> ${items}`);
+                        } else {
+                            previewContainer.html('<small class="text-muted"><i class="fa fa-exclamation-circle me-1"></i> No sub-components defined.</small>');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        previewContainer.addClass('d-none');
+                    });
+            }
 
             // Update cost and unit based on selection
             function attachEvents(row) {
-                const typeSelect = row.querySelector('.type-select');
-                const ingredientSelect = row.querySelector('.ingredient-select');
-                const productSelect = row.querySelector('.product-select');
-                const previewContainer = row.querySelector('.component-preview');
-                const costInput = row.querySelector('.cost-display');
-                const unitSelect = row.querySelector('.unit-select');
+                const $row = $(row);
+                const typeSelect = $row.find('.type-select');
+                const ingredientSelect = $row.find('.ingredient-select');
+                const productSelect = $row.find('.product-select');
+                const previewContainer = $row.find('.component-preview');
+                const costInput = $row.find('.cost-display');
 
-                // Toggle between Ingredient and Product list
-                typeSelect.addEventListener('change', function () {
+                typeSelect.on('change', function () {
                     if (this.value === 'ingredient') {
-                        ingredientSelect.classList.remove('d-none');
-                        ingredientSelect.disabled = false;
-                        productSelect.classList.add('d-none');
-                        productSelect.disabled = true;
-                        if(previewContainer) previewContainer.classList.add('d-none');
+                        ingredientSelect.next('.select2-container').show();
+                        ingredientSelect.prop('disabled', false);
+                        productSelect.next('.select2-container').hide();
+                        productSelect.prop('disabled', true);
+                        previewContainer.addClass('d-none');
                     } else {
-                        ingredientSelect.classList.add('d-none');
-                        ingredientSelect.disabled = true;
-                        productSelect.classList.remove('d-none');
-                        productSelect.disabled = false;
-                        unitSelect.value = 'piece'; // Default for products
+                        ingredientSelect.next('.select2-container').hide();
+                        ingredientSelect.prop('disabled', true);
+                        productSelect.next('.select2-container').show();
+                        productSelect.prop('disabled', false);
+                        $row.find('.unit-select').val('piece');
                     }
                     // Reset values
-                    ingredientSelect.value = '';
-                    productSelect.value = '';
-                    costInput.value = '';
-                    if(previewContainer) previewContainer.innerHTML = '';
-                });
-
-                // Update cost when item selected
-                [ingredientSelect, productSelect].forEach(sel => {
-                    sel.addEventListener('change', function () {
-                        const opt = this.options[this.selectedIndex];
-                        if (opt.value) {
-                            costInput.value = opt.getAttribute('data-cost') || 0;
-                            const unit = opt.getAttribute('data-unit');
-                            if (unit) unitSelect.value = unit;
-
-                            // Fetch recipe if Sub-Product
-                            if (this.classList.contains('product-select') && previewContainer) {
-                                previewContainer.classList.remove('d-none');
-                                previewContainer.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Checking components...';
-                                
-                                fetch("{{ url('products') }}/" + this.value + "/recipe")
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        if (data.has_recipe && data.ingredients && data.ingredients.length > 0) {
-                                            const items = data.ingredients.map(i => `${i.name} (${i.quantity}${i.unit})`).join(', ');
-                                            previewContainer.innerHTML = `<i class="fa fa-info-circle me-1"></i> <span class="text-dark">Includes:</span> ${items}`;
-                                        } else {
-                                            previewContainer.innerHTML = '<small class="text-muted"><i class="fa fa-exclamation-circle me-1"></i> No sub-components defined.</small>';
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.error(err);
-                                        previewContainer.classList.add('d-none');
-                                    });
-                            }
-                        } else {
-                            if (this.classList.contains('product-select') && previewContainer) {
-                                previewContainer.classList.add('d-none');
-                            }
-                        }
-                    });
+                    ingredientSelect.val(null).trigger('change');
+                    productSelect.val(null).trigger('change');
+                    costInput.val('');
+                    previewContainer.empty();
                 });
             }
 
             // Initial bind
-            document.querySelectorAll('.ingredient-row').forEach(row => attachEvents(row));
+            initSelect2();
+            $('.ingredient-row').each(function() {
+                attachEvents(this);
+                // Hide product select by default for the first row
+                $(this).find('.product-select').next('.select2-container').hide();
+            });
 
-            document.getElementById('add-ingredient').addEventListener('click', function () {
-                // Clone the first row as a template (simpler than string template)
-                const template = document.querySelector('.ingredient-row');
-                const newRow = template.cloneNode(true);
-
-                newRow.setAttribute('data-index', i);
+            $('#add-ingredient').on('click', function () {
+                const template = $('.ingredient-row').first();
+                // Destroy select2 before cloning to avoid ID conflicts and cloned behaviors
+                const $newRow = template.clone();
+                
+                $newRow.attr('data-index', i);
+                
+                // Cleanup the clone
+                $newRow.find('.select2-container').remove();
+                $newRow.find('select').show().removeClass('select2-hidden-accessible').removeAttr('data-select2-id');
 
                 // Update names
-                newRow.querySelector('.type-select').name = `ingredients[${i}][type]`;
-                newRow.querySelector('.ingredient-select').name = `ingredients[${i}][ingredient_id]`;
-                newRow.querySelector('.product-select').name = `ingredients[${i}][child_product_id]`;
-                newRow.querySelector('input[name^="ingredients"][placeholder="Qty"]').name = `ingredients[${i}][quantity]`;
-                newRow.querySelector('.unit-select').name = `ingredients[${i}][unit]`;
-                newRow.querySelector('.cost-display').name = `ingredients[${i}][cost_per_unit]`;
+                $newRow.find('.type-select').attr('name', `ingredients[${i}][type]`);
+                $newRow.find('.ingredient-select').attr('name', `ingredients[${i}][ingredient_id]`).val(null);
+                $newRow.find('.product-select').attr('name', `ingredients[${i}][child_product_id]`).val(null);
+                $newRow.find('input[placeholder="Qty"]').attr('name', `ingredients[${i}][quantity]`).val('');
+                $newRow.find('.unit-select').attr('name', `ingredients[${i}][unit]`).val('kg');
+                $newRow.find('.cost-display').attr('name', `ingredients[${i}][cost_per_unit]`).val('');
 
-                // Reset values
-                newRow.querySelector('.type-select').value = 'ingredient';
-                newRow.querySelector('.ingredient-select').value = '';
-                newRow.querySelector('.ingredient-select').classList.remove('d-none');
-                newRow.querySelector('.ingredient-select').disabled = false;
+                $newRow.find('.type-select').val('ingredient');
+                $newRow.find('.ingredient-select').show().prop('disabled', false);
+                $newRow.find('.product-select').hide().prop('disabled', true);
+                $newRow.find('.component-preview').addClass('d-none').empty();
 
-                newRow.querySelector('.product-select').value = '';
-                newRow.querySelector('.product-select').classList.add('d-none');
-                newRow.querySelector('.product-select').disabled = true;
-
-                newRow.querySelector('input[placeholder="Qty"]').value = '';
-                newRow.querySelector('.cost-display').value = '';
-
-                document.getElementById('ingredients-container').appendChild(newRow);
-                attachEvents(newRow);
+                $('#ingredients-container').append($newRow);
+                
+                initSelect2($newRow);
+                attachEvents($newRow);
+                
+                // Ensure initial visibility
+                $newRow.find('.product-select').next('.select2-container').hide();
+                
                 i++;
             });
 
-            document.getElementById('ingredients-container').addEventListener('click', function (e) {
-                if (e.target.closest('.remove-row')) {
-                    if (document.querySelectorAll('.ingredient-row').length > 1) {
-                        e.target.closest('.row').remove();
-                    } else {
-                        alert('At least one ingredient or sub-product is required.');
-                    }
+            $('#ingredients-container').on('click', '.remove-row', function () {
+                if ($('.ingredient-row').length > 1) {
+                    $(this).closest('.row').remove();
+                } else {
+                    alert('At least one ingredient or sub-product is required.');
                 }
             });
         });

@@ -158,4 +158,6 @@ return [
     'order' => 'طلب',
     'load_statement_msg' => 'أدخل كود الحساب ثم اضغط على تحميل كشف الحساب.',
     'loading_statement_msg' => 'جاري تحميل كشف الحساب...',
+    'no_recipes_yet' => 'لم يتم إضافة وصفات بعد.',
+    'no_results_found' => 'لا توجد وصفات تطابق بحثك.',
 ];

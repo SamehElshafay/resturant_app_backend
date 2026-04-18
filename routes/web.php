@@ -60,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products.index');
     Route::post('/products/bulk-update-prices', [App\Http\Controllers\ProductController::class, 'bulkUpdatePrices'])->name('products.bulk-update-prices');
     Route::post('/products/bulk-sync-recipes', [App\Http\Controllers\ProductController::class, 'bulkSyncRecipes'])->name('products.bulk-sync-recipes');
+    Route::get('/products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
     Route::post('/products', [App\Http\Controllers\ProductController::class, 'store'])->name('products.store');
     Route::put('/products/{product}', [App\Http\Controllers\ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [App\Http\Controllers\ProductController::class, 'destroy'])->name('products.destroy');
@@ -89,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/inventory/{product}/{branch}', [App\Http\Controllers\InventoryController::class, 'updateStock'])->name('inventory.updateStock');
 
     // Ingredients
+    Route::get('ingredients/search', [App\Http\Controllers\IngredientController::class, 'search'])->name('ingredients.search');
     Route::resource('ingredients', App\Http\Controllers\IngredientController::class);
     Route::post('productions/calculate', [App\Http\Controllers\ProductionController::class, 'calculate'])->name('productions.calculate');
     Route::get('productions/search-products', [App\Http\Controllers\ProductionController::class, 'searchProducts'])->name('productions.search-products');

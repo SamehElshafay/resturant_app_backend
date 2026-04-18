@@ -160,4 +160,6 @@ return [
     'order' => 'Order',
     'load_statement_msg' => 'Enter an account code and click Load Statement.',
     'loading_statement_msg' => 'Loading account statement...',
+    'no_recipes_yet' => 'No recipes added yet.',
+    'no_results_found' => 'No recipes found matching your search.',
 ];
