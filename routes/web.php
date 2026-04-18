@@ -104,7 +104,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Recipes
     Route::get('products/{product}/recipe', [App\Http\Controllers\ProductController::class, 'getRecipe'])->name('products.recipe');
-    Route::resource('recipes', App\Http\Controllers\RecipeController::class)->except(['edit', 'update']);
+    Route::resource('recipes', App\Http\Controllers\RecipeController::class);
 
     // Expenses
     Route::resource('expenses', App\Http\Controllers\ExpenseController::class)->only(['index', 'create', 'store', 'destroy', 'edit', 'update', 'show']);

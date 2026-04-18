@@ -34,6 +34,10 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
         <div class="table-responsive" id="recipe-table-wrapper">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
@@ -99,13 +103,16 @@
                             <td>{{ $recipe->ingredients->count() }}</td>
                             <td class="text-end pe-3">
                                 <div class="d-flex justify-content-end gap-1">
-                                    <a href="{{ route('recipes.show', $recipe->id) }}" class="btn btn-sm btn-info text-white rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                    <a href="{{ route('recipes.show', $recipe->id) }}" class="btn btn-sm btn-info text-white rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;" title="View">
                                         <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('recipes.edit', $recipe->id) }}" class="btn btn-sm btn-warning text-white rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;" title="Edit">
+                                        <i class="fa-solid fa-pen"></i>
                                     </a>
                                     <form id="delete-recipe-{{ $recipe->id }}" action="{{ route('recipes.destroy', $recipe->id) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
                                         <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"
-                                            onclick="confirmDelete('delete-recipe-{{ $recipe->id }}', '{{ $recipe->product->name_en ?? $recipe->product->name ?? 'this recipe' }}')">
+                                            onclick="confirmDelete('delete-recipe-{{ $recipe->id }}', '{{ $recipe->product->name_en ?? $recipe->product->name ?? 'this recipe' }}')" title="Delete">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
