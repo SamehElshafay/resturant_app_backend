@@ -9,12 +9,23 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $categoryId = $request->get('category_id');
+        $search = $request->get('search');
+        $perPage = $request->get('per_page', 12); // Default to 12
         
         $products = \App\Models\Product::with('category', 'branchPrices.branch', 'recipe')
             ->when($categoryId, function ($q) use ($categoryId) {
                 return $q->where('category_id', $categoryId);
             })
-            ->get();
+            ->when($search, function ($q) use ($search) {
+                return $q->where(function($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                          ->orWhere('name_ar', 'like', "%{$search}%")
+                          ->orWhere('name_en', 'like', "%{$search}%")
+                          ->orWhere('id', 'like', "%{$search}%");
+                });
+            })
+            ->paginate($perPage)
+            ->withQueryString();
             
         $categories = \App\Models\Category::all();
         $branches = \App\Models\Branch::all();

@@ -5,21 +5,41 @@
 @section('content')
 <div class="container-fluid py-4">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
+    <div class="row align-items-center mb-5 g-3">
+        <div class="col-lg-4">
             <h2 class="fw-bold text-dark mb-1">{{ __('messages.menu_products') }}</h2>
             <p class="text-secondary mb-0">Manage your menu items and prices across all branches</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="col-lg-5">
+            <div class="d-flex gap-2">
+                <div class="flex-grow-1">
+                    <form action="{{ route('products.index') }}" method="GET" id="searchForm" class="position-relative">
+                        <input type="text" name="search" id="productSearchInput" class="form-control rounded-pill ps-4 border-0 shadow-sm" 
+                               placeholder="Search by name or ID..." value="{{ request('search') }}" autocomplete="off">
+                        <button type="submit" class="btn btn-primary rounded-circle position-absolute end-0 top-0 m-1 p-0 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="fa-solid fa-magnifying-glass fs-6"></i>
+                        </button>
+                    </form>
+                </div>
+                <div style="width: 120px;">
+                    <select name="per_page" id="perPageSelect" class="form-select rounded-pill border-0 shadow-sm ps-3">
+                        @foreach([12, 24, 48, 96] as $val)
+                            <option value="{{ $val }}" {{ request('per_page', 12) == $val ? 'selected' : '' }}>{{ $val }} / Page</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 d-flex justify-content-lg-end gap-2">
             <div class="form-check d-flex align-items-center bg-white shadow-sm px-3 py-2 rounded-pill border">
                 <input class="form-check-input me-2 ms-0" type="checkbox" id="selectAllProducts">
                 <label class="form-check-label fw-semibold text-secondary small" for="selectAllProducts" style="cursor: pointer;">
                     Select All
                 </label>
             </div>
-            <button class="btn btn-primary btn-lg rounded-pill shadow-sm px-4 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <button class="btn btn-primary rounded-pill shadow-sm px-4 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addProductModal">
                 <i class="fa-solid fa-plus-circle fs-5 me-2"></i>
-                <span>Add New Product</span>
+                <span>Add Product</span>
             </button>
         </div>
     </div>
@@ -35,7 +55,7 @@
     @endif
 
     <!-- Products Grid -->
-    <div class="row g-4">
+    <div class="row g-4" id="productsGrid">
         @foreach($products as $product)
             <div class="col-xl-3 col-lg-4 col-md-6 product-item">
                 <div class="card product-card shadow-sm h-100 border-0 rounded-4 overflow-hidden bg-white position-relative">
@@ -175,6 +195,11 @@
                 </div>
             </div>
         @endforeach
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-5 d-flex justify-content-center" id="paginationLinks">
+        {{ $products->links() }}
     </div>
 
     @if($products->count() == 0)
@@ -643,6 +668,7 @@
                 } else {
                     window.showToast(data.message || 'Validation error', 'error');
                 }
+                initializeCheckboxes();
             } catch (error) {
                 window.showToast('Submission error', 'error');
             } finally {
@@ -650,6 +676,118 @@
                 btn.innerHTML = originalHtml;
             }
         });
+
+        initializeCheckboxes();
     });
+
+    // Live Search Logic
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('productSearchInput');
+    const perPageSelect = document.getElementById('perPageSelect');
+    
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        performSearch();
+    });
+
+    perPageSelect.addEventListener('change', function() {
+        performSearch();
+    });
+
+    const productsGrid = document.getElementById('productsGrid');
+    const paginationLinks = document.getElementById('paginationLinks');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            performSearch();
+        }, 500);
+    });
+
+    async function performSearch(page = 1) {
+        const query = searchInput.value;
+        const perPage = perPageSelect.value;
+
+        // Add loading state
+        productsGrid.style.opacity = '0.5';
+        
+        const url = new URL(window.location.href);
+        url.searchParams.set('search', query);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.set('page', page); 
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const newGrid = doc.getElementById('productsGrid');
+            const newPagination = doc.getElementById('paginationLinks');
+
+            if (newGrid) productsGrid.innerHTML = newGrid.innerHTML;
+            if (newPagination) paginationLinks.innerHTML = newPagination.innerHTML;
+            
+            // Re-initialize selection logic for new elements
+            initializeCheckboxes();
+            
+            // Update URL without reload
+            window.history.pushState({}, '', url);
+        } catch (error) {
+            console.error('Search error:', error);
+        } finally {
+            productsGrid.style.opacity = '1';
+        }
+    }
+
+    function initializeCheckboxes() {
+        const productCheckboxes = document.querySelectorAll('.product-checkbox');
+        productCheckboxes.forEach(cb => {
+            cb.addEventListener('change', updateUI);
+        });
+
+        // Hijack pagination links
+        const links = paginationLinks.querySelectorAll('a');
+        links.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = new URL(this.href);
+                const page = url.searchParams.get('page');
+                performSearch(page);
+            });
+        });
+    }
+
+    // Export updateUI to global if needed or keep it accessible
+    function updateUI() {
+        const selected = document.querySelectorAll('.product-checkbox:checked');
+        const bulkActionBar = document.getElementById('bulkActionBar');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        const selectAllCheckbox = document.getElementById('selectAllProducts');
+        const productCheckboxes = document.querySelectorAll('.product-checkbox');
+
+        selectedCountSpan.innerText = selected.length;
+        
+        if (selected.length > 0) {
+            bulkActionBar.classList.remove('d-none');
+        } else {
+            bulkActionBar.classList.add('d-none');
+            if(selectAllCheckbox) selectAllCheckbox.checked = false;
+        }
+        
+        productCheckboxes.forEach(cb => {
+            const card = cb.closest('.product-card');
+            if (cb.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+    }
 </script>
 @endsection
