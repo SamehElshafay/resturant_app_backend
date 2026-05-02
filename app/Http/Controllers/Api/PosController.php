@@ -11,6 +11,9 @@ use App\Models\RestaurantTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\AddItemsToOrderRequest;
+use App\Http\Requests\RemoveItemFromOrderRequest;
+use App\Http\Requests\UpdateItemQuantityRequest;
 
 class PosController extends Controller
 {
@@ -637,6 +640,241 @@ class PosController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Order creation failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function addItemsToOrder(AddItemsToOrderRequest $request, $id)
+    {
+        try {
+            return DB::transaction(function () use ($request, $id) {
+                $order = \App\Models\Order::find($id);
+
+                if (!$order) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => app()->getLocale() == 'ar' ? 'الطلب غير موجود' : 'Order not found'
+                    ], 404);
+                }
+
+                if ($order->status === 'completed') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => app()->getLocale() == 'ar' ? 'لا يمكن إضافة أصناف لطلب مكتمل' : 'Cannot add items to a completed order'
+                    ], 422);
+                }
+
+                $branchId = $order->branch_id;
+
+                foreach ($request->items as $item) {
+                    // Check Stock Availability
+                    $branchProduct = \App\Models\BranchProduct::where('branch_id', $branchId)
+                        ->where('product_id', $item['product_id'])
+                        ->first();
+
+                    if (!$branchProduct || $branchProduct->stock_quantity < $item['quantity']) {
+                        $product = \App\Models\Product::find($item['product_id']);
+                        $productName = $product ? $product->name : 'Unknown Product';
+                        throw new \Exception(
+                            app()->getLocale() == 'ar' 
+                                ? "كمية المخزون غير كافية للمنتج: {$productName}" 
+                                : "Insufficient stock for product: {$productName}"
+                        );
+                    }
+
+                    \App\Models\OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item['product_id'],
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price'],
+                        'item_total' => $item['price'] * $item['quantity'],
+                    ]);
+
+                    // Deduct from branch inventory
+                    $branchProduct->decrement('stock_quantity', $item['quantity']);
+                }
+
+                // Update order total and charges
+                $order->update([
+                    'total_amount' => $request->total_amount,
+                    'tax' => $request->tax ?? $order->tax,
+                    'discount' => $request->discount ?? $order->discount,
+                    'notes' => $request->notes ?? $order->notes,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => app()->getLocale() == 'ar' ? 'تم إضافة الأصناف للطلب بنجاح' : 'Items added to order successfully',
+                    'data' => [
+                        'order' => $order->load('items.product')
+                    ]
+                ]);
+            });
+        } catch (\Exception $e) {
+            Log::error('Adding items to order failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => app()->getLocale() == 'ar' ? 'فشلت عملية إضافة الأصناف: ' . $e->getMessage() : 'Failed to add items: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function removeItemFromOrder(RemoveItemFromOrderRequest $request, $order_id, $item_id)
+    {
+        try {
+            return DB::transaction(function () use ($request, $order_id, $item_id) {
+                $order = \App\Models\Order::find($order_id);
+
+                if (!$order) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => app()->getLocale() == 'ar' ? 'الطلب غير موجود' : 'Order not found'
+                    ], 404);
+                }
+
+                if ($order->status === 'completed') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => app()->getLocale() == 'ar' ? 'لا يمكن تعديل طلب مكتمل' : 'Cannot modify a completed order'
+                    ], 422);
+                }
+
+                $item = \App\Models\OrderItem::where('id', $item_id)
+                    ->where('order_id', $order_id)
+                    ->first();
+
+                if (!$item) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => app()->getLocale() == 'ar' ? 'الصنف غير موجود في هذا الطلب' : 'Item not found in this order'
+                    ], 404);
+                }
+
+                // Reverse Stock: Return quantity to branch inventory
+                $branchProduct = \App\Models\BranchProduct::where('branch_id', $order->branch_id)
+                    ->where('product_id', $item->product_id)
+                    ->first();
+
+                if ($branchProduct) {
+                    $branchProduct->increment('stock_quantity', $item->quantity);
+                }
+
+                // Delete the item
+                $item->delete();
+
+                // Update order total and charges
+                $order->update([
+                    'total_amount' => $request->total_amount,
+                    'tax' => $request->tax ?? $order->tax,
+                    'discount' => $request->discount ?? $order->discount,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => app()->getLocale() == 'ar' ? 'تم حذف الصنف بنجاح' : 'Item removed successfully',
+                    'data' => [
+                        'order' => $order->load('items.product')
+                    ]
+                ]);
+            });
+        } catch (\Exception $e) {
+            Log::error('Removing item from order failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => app()->getLocale() == 'ar' ? 'فشلت عملية حذف الصنف: ' . $e->getMessage() : 'Failed to remove item: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateItemQuantity(UpdateItemQuantityRequest $request, $order_id, $item_id)
+    {
+        try {
+            return DB::transaction(function () use ($request, $order_id, $item_id) {
+                $order = \App\Models\Order::find($order_id);
+
+                if (!$order) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => app()->getLocale() == 'ar' ? 'الطلب غير موجود' : 'Order not found'
+                    ], 404);
+                }
+
+                if ($order->status === 'completed') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => app()->getLocale() == 'ar' ? 'لا يمكن تعديل طلب مكتمل' : 'Cannot modify a completed order'
+                    ], 422);
+                }
+
+                $item = \App\Models\OrderItem::where('id', $item_id)
+                    ->where('order_id', $order_id)
+                    ->first();
+
+                if (!$item) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => app()->getLocale() == 'ar' ? 'الصنف غير موجود في هذا الطلب' : 'Item not found in this order'
+                    ], 404);
+                }
+
+                $newQuantity = $request->quantity;
+                $oldQuantity = $item->quantity;
+                $diff = $newQuantity - $oldQuantity;
+
+                $branchProduct = \App\Models\BranchProduct::where('branch_id', $order->branch_id)
+                    ->where('product_id', $item->product_id)
+                    ->first();
+
+                if ($diff > 0) {
+                    // Increasing quantity: check and deduct stock
+                    if (!$branchProduct || $branchProduct->stock_quantity < $diff) {
+                        $product = \App\Models\Product::find($item->product_id);
+                        $productName = $product ? $product->name : 'Unknown Product';
+                        throw new \Exception(
+                            app()->getLocale() == 'ar' 
+                                ? "كمية المخزون غير كافية للمنتج: {$productName}" 
+                                : "Insufficient stock for product: {$productName}"
+                        );
+                    }
+                    $branchProduct->decrement('stock_quantity', $diff);
+                } elseif ($diff < 0) {
+                    // Decreasing quantity: return to stock
+                    if ($branchProduct) {
+                        $branchProduct->increment('stock_quantity', abs($diff));
+                    }
+                }
+
+                if ($newQuantity <= 0) {
+                    $item->delete();
+                    $message = app()->getLocale() == 'ar' ? 'تم حذف الصنف لأن الكمية أصبحت صفر' : 'Item removed as quantity reached zero';
+                } else {
+                    $item->update([
+                        'quantity' => $newQuantity,
+                        'item_total' => $newQuantity * $item->price
+                    ]);
+                    $message = app()->getLocale() == 'ar' ? 'تم تحديث الكمية بنجاح' : 'Quantity updated successfully';
+                }
+
+                // Update order total and charges
+                $order->update([
+                    'total_amount' => $request->total_amount,
+                    'tax' => $request->tax ?? $order->tax,
+                    'discount' => $request->discount ?? $order->discount,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'data' => [
+                        'order' => $order->load('items.product')
+                    ]
+                ]);
+            });
+        } catch (\Exception $e) {
+            Log::error('Updating item quantity failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => app()->getLocale() == 'ar' ? 'فشلت عملية تحديث الكمية: ' . $e->getMessage() : 'Failed to update quantity: ' . $e->getMessage(),
             ], 500);
         }
     }

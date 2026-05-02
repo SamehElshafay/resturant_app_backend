@@ -23,6 +23,9 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\TokenExpirationMiddlewar
         Route::post('/orders', [PosController::class, 'storeOrder']);
         Route::get('/orders', [PosController::class, 'getOrders']);
         Route::get('/orders/{id}', [PosController::class, 'getOrder']);
+        Route::post('/orders/{id}/add-items', [PosController::class, 'addItemsToOrder']);
+        Route::delete('/orders/{id}/items/{item_id}', [PosController::class, 'removeItemFromOrder']);
+        Route::put('/orders/{id}/items/{item_id}/quantity', [PosController::class, 'updateItemQuantity']);
         Route::post('/orders/{id}/pay', [PosController::class, 'payOrder']);
         Route::get('/printer-configs', [PosController::class, 'getPrinterConfigs']);
         Route::post('/printer-configs', [PosController::class, 'updatePrinterConfig']);
