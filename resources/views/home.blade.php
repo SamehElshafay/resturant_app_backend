@@ -106,7 +106,7 @@
                         <tbody>
                             @forelse($recentOrders as $order)
                                 <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <td class="ps-4 fw-bold text-primary">#{{ $order->order_number ?? $order->id }}</td>
+                                    <td class="ps-4 fw-bold text-primary">#{{ $order->order_number ?? $order->daily_number }}</td>
                                     <td>{{ $order->customer->first_name ?? 'Walk-in' }}</td>
                                     <td><span
                                             class="badge bg-light-custom text-main fw-normal">{{ $order->branch->name ?? 'N/A' }}</span>
