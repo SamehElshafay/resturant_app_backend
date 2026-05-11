@@ -18,7 +18,6 @@ class OrderController extends Controller
             'cashier',
             'driver',
             'table.zone',
-            'items.modifiers' // If you have modifiers later
         ])->findOrFail($id);
 
         return view('orders.show', compact('order'));
