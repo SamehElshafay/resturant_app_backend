@@ -28,19 +28,14 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Order::with(['branch', 'cashier', 'customer']);
+        $query = Order::with(['branch', 'cashier']);
 
-        // Search by Order Number or Customer Name/Phone
+        // Search by Order Number
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('order_number', 'like', "%{$search}%")
-                  ->orWhere('daily_number', 'like', "%{$search}%")
-                  ->orWhereHas('customer', function($q2) use ($search) {
-                      $q2->where('first_name', 'like', "%{$search}%")
-                         ->orWhere('last_name', 'like', "%{$search}%")
-                         ->orWhere('phone', 'like', "%{$search}%");
-                  });
+                  ->orWhere('daily_number', 'like', "%{$search}%");
             });
         }
 

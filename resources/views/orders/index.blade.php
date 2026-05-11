@@ -30,7 +30,7 @@
                             <i class="fa-solid fa-search"></i>
                         </span>
                         <input type="text" name="search" class="form-control border-0 bg-light-custom" 
-                               placeholder="{{ __('Order #, Customer Name, Phone...') }}" 
+                               placeholder="{{ __('Search Order #...') }}" 
                                value="{{ request('search') }}">
                     </div>
                 </div>
