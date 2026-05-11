@@ -542,14 +542,19 @@ class PosController extends Controller
     {
         Log::info('Order creation request recieved', $request->all());
         $request->validate([
-            'items' => 'required|array',
-            'type' => 'required|in:dine_in,takeaway,delivery',
-            'table_id' => 'nullable|exists:restaurant_tables,id',
-            'driver_id' => 'nullable|exists:users,id',
+            'items'        => 'required|array',
+            'type'         => 'required|in:dine_in,takeaway,delivery',
+            'table_id'     => 'nullable|exists:restaurant_tables,id',
+            'driver_id'    => 'nullable|exists:users,id',
             'total_amount' => 'required|numeric',
-            'paid_amount' => 'nullable|numeric',
-            'tax' => 'required|numeric',
-            'discount' => 'nullable|numeric',
+            'paid_amount'  => 'nullable|numeric',
+            'tax'          => 'required|numeric',
+            'discount'     => 'nullable|numeric',
+            // order_number: optional – sent by client for offline orders (e.g. "OFF_1")
+            //               if omitted the server generates it automatically
+            'order_number' => 'nullable|string|max:50',
+            // is_offline: client declares whether the order was created without internet
+            'is_offline'   => 'nullable|boolean',
         ]);
 
         try {
@@ -567,27 +572,49 @@ class PosController extends Controller
                     throw new \Exception('Branch not identified for this POS device.');
                 }
 
-                // Simple daily number logic
+                // -----------------------------------------------------------
+                // order_number logic:
+                //   • If the client already has an order_number (offline case)
+                //     → use it as-is (e.g. "OFF_1", "OFF_42")
+                //   • Otherwise the server auto-generates a sequential number
+                //     that resets to 1 every midnight  (per branch)
+                // -----------------------------------------------------------
+                if ($request->filled('order_number')) {
+                    // Offline order: trust what the client sent
+                    $orderNumber = $request->order_number;
+                } else {
+                    // Online order: count today's orders for this branch and add 1
+                    $todayCount = \App\Models\Order::where('branch_id', $branchId)
+                        ->whereDate('created_at', today())
+                        ->count();
+                    $orderNumber = (string) ($todayCount + 1);
+                }
+
+                // Simple daily number (kept for backward compat / internal use)
                 $dailyNumber = \App\Models\Order::where('branch_id', $branchId)
                     ->whereDate('created_at', today())
                     ->count() + 1;
+
+                $isOffline = filter_var($request->input('is_offline', false), FILTER_VALIDATE_BOOLEAN);
 
                 // Logic: Takeaway and Delivery are paid instantly (Completed), Dine-in stays open (Pending)
                 $status = in_array($request->type, ['takeaway', 'delivery']) ? 'completed' : 'pending';
 
                 $order = \App\Models\Order::create([
-                    'branch_id' => $branch_id ?? $branchId, // Ensure we use the correct variable
-                    'cashier_id' => $user->id,
-                    'driver_id' => $request->type === 'delivery' ? $request->driver_id : null,
-                    'table_id' => $request->table_id,
+                    'branch_id'    => $branchId,
+                    'cashier_id'   => $user->id,
+                    'driver_id'    => $request->type === 'delivery' ? $request->driver_id : null,
+                    'table_id'     => $request->table_id,
+                    'order_number' => $orderNumber,
+                    'is_offline'   => $isOffline,
                     'daily_number' => $dailyNumber,
-                    'type' => $request->type,
-                    'status' => $status,
+                    'type'         => $request->type,
+                    'status'       => $status,
                     'total_amount' => $request->total_amount,
-                    'paid_amount' => $request->paid_amount ?? ($status == 'completed' ? $request->total_amount : 0),
-                    'tax' => $request->tax,
-                    'discount' => $request->discount ?? 0,
-                    'notes' => $request->notes,
+                    'paid_amount'  => $request->paid_amount ?? ($status == 'completed' ? $request->total_amount : 0),
+                    'tax'          => $request->tax,
+                    'discount'     => $request->discount ?? 0,
+                    'notes'        => $request->notes,
                 ]);
 
                 // Link order to table if it's dine_in
