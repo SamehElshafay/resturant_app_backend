@@ -89,7 +89,7 @@
                 <div class="card-header border-0 p-4 d-flex justify-content-between align-items-center"
                     style="background: transparent;">
                     <h5 class="fw-bold mb-0">Recent Orders</h5>
-                    <button class="btn btn-light-custom btn-sm rounded-pill px-3">View All</button>
+                    <a href="{{ route('orders.index') }}" class="btn btn-light-custom btn-sm rounded-pill px-3">View All</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" style="color: var(--text-main);">
