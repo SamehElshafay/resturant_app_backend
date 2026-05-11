@@ -96,6 +96,7 @@
                         <thead style="background: rgba(0,0,0,0.03);">
                             <tr>
                                 <th class="ps-4 border-0">Order Number</th>
+                                <th class="border-0 text-center">Source</th>
                                 <th class="border-0">Customer</th>
                                 <th class="border-0">Branch</th>
                                 <th class="border-0">Amount</th>
@@ -105,8 +106,21 @@
                         </thead>
                         <tbody>
                             @forelse($recentOrders as $order)
-                                <tr style="border-bottom: 1px solid var(--border-color);">
+                                <tr onclick="window.location='{{ route('orders.show', $order->id) }}'" 
+                                    style="border-bottom: 1px solid var(--border-color); cursor: pointer;" 
+                                    class="order-row">
                                     <td class="ps-4 fw-bold text-primary">#{{ $order->order_number ?? $order->daily_number }}</td>
+                                    <td class="text-center">
+                                        @if($order->is_offline)
+                                            <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2" title="Offline Order">
+                                                <i class="fa-solid fa-cloud-slash small me-1"></i> Offline
+                                            </span>
+                                        @else
+                                            <span class="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-2" title="Online Order">
+                                                <i class="fa-solid fa-wifi small me-1"></i> Online
+                                            </span>
+                                        @endif
+                                    </td>
                                     <td>{{ $order->customer->first_name ?? 'Walk-in' }}</td>
                                     <td><span
                                             class="badge bg-light-custom text-main fw-normal">{{ $order->branch->name ?? 'N/A' }}</span>
@@ -408,6 +422,10 @@
 
         .table-light {
             --bs-table-bg: rgba(0, 0, 0, 0.02) !important;
+        }
+
+        .order-row:hover {
+            background: rgba(99, 102, 241, 0.05) !important;
         }
     </style>
 @endsection

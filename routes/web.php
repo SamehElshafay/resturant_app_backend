@@ -128,6 +128,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
 
+    // Orders
+    Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('orders.show');
+
     // System Settings & Token Management
     Route::get('/system/settings', [App\Http\Controllers\SystemSettingController::class, 'index'])->name('system.settings');
     Route::post('/system/settings/tokens', [App\Http\Controllers\SystemSettingController::class, 'updateTokenSettings'])->name('system.settings.tokens');
