@@ -95,7 +95,7 @@
                     <table class="table table-hover align-middle mb-0" style="color: var(--text-main);">
                         <thead style="background: rgba(0,0,0,0.03);">
                             <tr>
-                                <th class="ps-4 border-0">Order ID</th>
+                                <th class="ps-4 border-0">Order Number</th>
                                 <th class="border-0">Customer</th>
                                 <th class="border-0">Branch</th>
                                 <th class="border-0">Amount</th>
@@ -106,7 +106,7 @@
                         <tbody>
                             @forelse($recentOrders as $order)
                                 <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <td class="ps-4 fw-bold text-primary">#{{ $order->id }}</td>
+                                    <td class="ps-4 fw-bold text-primary">#{{ $order->order_number ?? $order->id }}</td>
                                     <td>{{ $order->customer->first_name ?? 'Walk-in' }}</td>
                                     <td><span
                                             class="badge bg-light-custom text-main fw-normal">{{ $order->branch->name ?? 'N/A' }}</span>
