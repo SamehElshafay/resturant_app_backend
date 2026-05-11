@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Order Details - #' . ($order->order_number ?? $order->daily_number))
+@section('title', __('Order Details') . ' - #' . ($order->order_number ?? $order->daily_number))
 
 @section('content')
 <div class="container-fluid animate__animated animate__fadeIn">
@@ -9,19 +9,19 @@
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('orders.index') }}">Orders</a></li>
-                    <li class="breadcrumb-item active">Order Details</li>
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('orders.index') }}">{{ __('Orders') }}</a></li>
+                    <li class="breadcrumb-item active">{{ __('Order Details') }}</li>
                 </ol>
             </nav>
-            <h3 class="fw-bold mb-0">Order #{{ $order->order_number ?? $order->daily_number }}</h3>
+            <h3 class="fw-bold mb-0">{{ __('Order') }} #{{ $order->order_number ?? $order->daily_number }}</h3>
         </div>
         <div class="d-flex gap-2">
             <button onclick="window.print()" class="btn btn-outline-primary rounded-pill px-4">
-                <i class="fa-solid fa-print me-2"></i> Print Invoice
+                <i class="fa-solid fa-print me-2"></i> {{ __('Print Invoice') }}
             </button>
             <a href="{{ route('home') }}" class="btn btn-primary rounded-pill px-4">
-                <i class="fa-solid fa-arrow-left me-2"></i> Back to Dashboard
+                <i class="fa-solid fa-arrow-left me-2"></i> {{ __('Back to Dashboard') }}
             </a>
         </div>
     </div>
@@ -32,16 +32,16 @@
             <!-- Order Items Card -->
             <div class="card border-0 shadow-sm mb-4" style="background: var(--card-bg); color: var(--text-main); border-radius: 20px;">
                 <div class="card-header bg-transparent border-0 p-4">
-                    <h5 class="fw-bold mb-0">Order Items</h5>
+                    <h5 class="fw-bold mb-0">{{ __('Order Items') }}</h5>
                 </div>
                 <div class="table-responsive">
                     <table class="table align-middle">
                         <thead class="bg-light-custom text-secondary">
                             <tr>
-                                <th class="ps-4 border-0">Product</th>
-                                <th class="border-0">Price</th>
-                                <th class="border-0">Qty</th>
-                                <th class="pe-4 border-0 text-end">Total</th>
+                                <th class="ps-4 border-0">{{ __('messages.product') ?? 'Product' }}</th>
+                                <th class="border-0">{{ __('Price') }}</th>
+                                <th class="border-0">{{ __('Qty') }}</th>
+                                <th class="pe-4 border-0 text-end">{{ __('messages.total') ?? 'Total' }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,15 +66,21 @@
                         </tbody>
                         <tfoot class="border-0">
                             <tr>
-                                <td colspan="3" class="text-end py-3 border-0">Subtotal</td>
-                                <td class="text-end pe-4 py-3 border-0 fw-semibold">${{ number_format($order->total_amount - $order->tax, 2) }}</td>
+                                <td colspan="3" class="text-end py-3 border-0">{{ __('messages.subtotal') ?? 'Subtotal' }}</td>
+                                <td class="text-end pe-4 py-3 border-0 fw-semibold">${{ number_format($order->items->sum('item_total'), 2) }}</td>
                             </tr>
                             <tr>
-                                <td colspan="3" class="text-end py-2 border-0">Tax (VAT)</td>
+                                <td colspan="3" class="text-end py-2 border-0">{{ __('messages.tax') ?? 'Tax (VAT)' }}</td>
                                 <td class="text-end pe-4 py-2 border-0 text-danger">+ ${{ number_format($order->tax, 2) }}</td>
                             </tr>
+                            @if($order->discount > 0)
+                            <tr>
+                                <td colspan="3" class="text-end py-2 border-0">{{ __('Discount') }}</td>
+                                <td class="text-end pe-4 py-2 border-0 text-success">- ${{ number_format($order->discount, 2) }}</td>
+                            </tr>
+                            @endif
                             <tr class="fs-5">
-                                <td colspan="3" class="text-end py-3 border-0 fw-bold">Total Amount</td>
+                                <td colspan="3" class="text-end py-3 border-0 fw-bold">{{ __('Total Amount') }}</td>
                                 <td class="text-end pe-4 py-3 border-0 text-primary fw-bold">${{ number_format($order->total_amount, 2) }}</td>
                             </tr>
                         </tfoot>
@@ -86,19 +92,19 @@
             <div class="row g-4">
                 <div class="col-md-6">
                     <div class="card border-0 shadow-sm p-4 h-100" style="background: var(--card-bg); border-radius: 20px;">
-                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-circle-info text-primary me-2"></i> Order Notes</h6>
-                        <p class="text-secondary mb-0">{{ $order->notes ?? 'No special instructions provided for this order.' }}</p>
+                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-circle-info text-primary me-2"></i> {{ __('Order Notes') }}</h6>
+                        <p class="text-secondary mb-0">{{ $order->notes ?? __('No special instructions provided for this order.') }}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card border-0 shadow-sm p-4 h-100" style="background: var(--card-bg); border-radius: 20px;">
-                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-credit-card text-success me-2"></i> Payment Summary</h6>
+                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-credit-card text-success me-2"></i> {{ __('Payment Summary') }}</h6>
                         <div class="d-flex justify-content-between mb-2">
-                            <span class="text-secondary">Amount Paid:</span>
+                            <span class="text-secondary">{{ __('Amount Paid') }}:</span>
                             <span class="fw-bold">${{ number_format($order->paid_amount, 2) }}</span>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <span class="text-secondary">Balance:</span>
+                            <span class="text-secondary">{{ __('Balance') }}:</span>
                             <span class="fw-bold text-{{ $order->total_amount - $order->paid_amount > 0 ? 'danger' : 'success' }}">
                                 ${{ number_format($order->total_amount - $order->paid_amount, 2) }}
                             </span>
@@ -112,34 +118,34 @@
         <div class="col-md-4">
             <!-- Order Status & Metadata -->
             <div class="card border-0 shadow-sm p-4 mb-4" style="background: var(--card-bg); border-radius: 20px;">
-                <h6 class="fw-bold mb-4">Metadata & Status</h6>
+                <h6 class="fw-bold mb-4">{{ __('Metadata & Status') }}</h6>
                 
                 <div class="mb-4">
-                    <label class="small text-secondary d-block mb-1">Status</label>
+                    <label class="small text-secondary d-block mb-1">{{ __('messages.status') ?? 'Status' }}</label>
                     <span class="badge rounded-pill bg-{{ $order->status === 'completed' ? 'success' : 'warning' }} bg-opacity-10 text-{{ $order->status === 'completed' ? 'success' : 'warning' }} px-3 py-2 w-100 fs-6">
-                        {{ ucfirst($order->status) }}
+                        {{ __($order->status) }}
                     </span>
                 </div>
 
                 <div class="mb-4">
-                    <label class="small text-secondary d-block mb-1">Order Type</label>
+                    <label class="small text-secondary d-block mb-1">{{ __('Order Type') }}</label>
                     <div class="d-flex align-items-center p-2 bg-light-custom rounded-3">
                         <i class="fa-solid fa-{{ $order->type === 'dine_in' ? 'chair' : ($order->type === 'delivery' ? 'motorcycle' : 'bag-shopping') }} text-primary me-3"></i>
-                        <span class="fw-bold">{{ ucfirst(str_replace('_', ' ', $order->type)) }}</span>
+                        <span class="fw-bold">{{ __('messages.' . $order->type) ?? ucfirst(str_replace('_', ' ', $order->type)) }}</span>
                     </div>
                 </div>
 
                 <div class="mb-0">
-                    <label class="small text-secondary d-block mb-1">Source Connection</label>
+                    <label class="small text-secondary d-block mb-1">{{ __('Source Connection') }}</label>
                     @if($order->is_offline)
                         <div class="d-flex align-items-center p-2 bg-secondary bg-opacity-10 text-secondary rounded-3 border border-secondary border-opacity-25">
                             <i class="fa-solid fa-cloud-slash me-3"></i>
-                            <span class="fw-bold">Offline Sync</span>
+                            <span class="fw-bold">{{ __('Offline Sync') }}</span>
                         </div>
                     @else
                         <div class="d-flex align-items-center p-2 bg-info bg-opacity-10 text-info rounded-3 border border-info border-opacity-25">
                             <i class="fa-solid fa-wifi me-3"></i>
-                            <span class="fw-bold">Real-time Online</span>
+                            <span class="fw-bold">{{ __('Real-time Online') }}</span>
                         </div>
                     @endif
                 </div>
@@ -147,15 +153,15 @@
 
             <!-- Entity Info Card -->
             <div class="card border-0 shadow-sm p-4" style="background: var(--card-bg); border-radius: 20px;">
-                <h6 class="fw-bold mb-4">Personnel & Location</h6>
+                <h6 class="fw-bold mb-4">{{ __('Personnel & Location') }}</h6>
                 
                 <div class="d-flex align-items-center mb-4">
                     <div class="p-3 bg-light-custom rounded-circle me-3">
                         <i class="fa-solid fa-user-tie text-primary"></i>
                     </div>
                     <div>
-                        <small class="text-secondary d-block">Cashier</small>
-                        <span class="fw-bold">{{ $order->cashier->name ?? 'System' }}</span>
+                        <small class="text-secondary d-block">{{ __('Cashier') }}</small>
+                        <span class="fw-bold">{{ $order->cashier->name ?? __('System') }}</span>
                     </div>
                 </div>
 
@@ -164,8 +170,8 @@
                         <i class="fa-solid fa-shop text-primary"></i>
                     </div>
                     <div>
-                        <small class="text-secondary d-block">Branch</small>
-                        <span class="fw-bold">{{ $order->branch->name ?? 'Central' }}</span>
+                        <small class="text-secondary d-block">{{ __('Branch') }}</small>
+                        <span class="fw-bold">{{ $order->branch->name ?? __('Central') }}</span>
                     </div>
                 </div>
 
@@ -175,8 +181,8 @@
                         <i class="fa-solid fa-table-cells-large text-primary"></i>
                     </div>
                     <div>
-                        <small class="text-secondary d-block">Table / Zone</small>
-                        <span class="fw-bold">{{ $order->table->number }} ({{ $order->table->zone->name ?? 'General' }})</span>
+                        <small class="text-secondary d-block">{{ __('Table / Zone') }}</small>
+                        <span class="fw-bold">{{ $order->table->number }} ({{ $order->table->zone->name ?? __('General') }})</span>
                     </div>
                 </div>
                 @endif
@@ -187,7 +193,7 @@
                         <i class="fa-solid fa-motorcycle text-primary"></i>
                     </div>
                     <div>
-                        <small class="text-secondary d-block">Delivery Driver</small>
+                        <small class="text-secondary d-block">{{ __('Delivery Driver') }}</small>
                         <span class="fw-bold">{{ $order->driver->name ?? 'N/A' }}</span>
                     </div>
                 </div>
